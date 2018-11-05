@@ -1,2 +1,15 @@
-.idea
+/.idea
 *.iml
+
+*.log
+/hls/*
+!/hls/*.app
+!/hls/source
+!/hls/Mandelbrot
+/hls/Mandelbrot/*
+!/hls/Mandelbrot/*.aps
+!/hls/Mandelbrot/*.directive
+
+/overlays/*
+!/overlays/*.xpr
+!/overlays/*.srcs/
