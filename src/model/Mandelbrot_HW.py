@@ -10,8 +10,8 @@ class Mandelbrot_HW:
         self.ip = ip
 
     def calculate(self, plot_width, plot_height):
-        v_min = self.max_iteration
-        v_max = 0
+        v_min = 0
+        v_max = self.max_iteration
         iterations = [[0 for _ in range(plot_width)] for _ in range(plot_height)]
         scale_width = self.x_scale[1] - self.x_scale[0]
         scale_height = self.y_scale[1] - self.y_scale[0]
