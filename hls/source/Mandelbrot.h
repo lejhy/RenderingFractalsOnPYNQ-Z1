@@ -2,7 +2,12 @@
 #define _MANDELBROT_H_
 
 #include "Config.h"
+#include "hls_video.h"
 
-void calc_pixel(int plot_x, int plot_y, int* iteration, Config& config);
+typedef hls::stream<ap_axiu<24,1,1,1> >     AXI_STREAM;
+typedef hls::Scalar<3, unsigned char>       RGB_PIXEL;
+typedef hls::Mat<1080, 1920, HLS_8UC3>      RGB_IMAGE;
+
+void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config);
 
 #endif

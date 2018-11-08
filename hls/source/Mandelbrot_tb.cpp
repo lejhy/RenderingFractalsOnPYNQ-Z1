@@ -1,4 +1,5 @@
 #include <iostream>
+#include <hls_opencv.h>
 #include "Mandelbrot.h"
 #include "Config.h"
 
@@ -6,14 +7,22 @@ using namespace std;
 
 int main () {
 	Config config;
-	set_config (1920, 1080, -2.5, 1.0, -1.0, 1.0, 1000, config);
-	int iteration;
-	calc_pixel(0, 0, &iteration, config);
+	config.img_width = 1920;
+	config.img_height = 1080;
+	config.plot_x_min = -2.5;
+	config.plot_y_max = 0.0;
+	config.plot_width = 3.5;
+	config.plot_height = 2.0;
+	config.max_iteration = 1000;
 
-	cout << iteration << endl;
+	AXI_STREAM img_axi;
+	IplImage* img = cvCreateImage(cvSize(config.img_width, config.img_height), 8, 3);
 
-	calc_pixel(960, 540, &iteration, config);
+	mandelbrot(img_axi, config);
 
-	cout << iteration << endl;
+	AXIvideo2IplImage(img_axi, img);
+
+	cvSaveImage("img.bmp", img);
+
 	return 0;
 }

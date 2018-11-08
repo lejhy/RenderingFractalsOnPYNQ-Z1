@@ -1,16 +1,36 @@
 #include "Mandelbrot.h"
 
-void calc_pixel(int plot_x, int plot_y, int* iteration, Config& config) {
+void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 
-	double x_scaled = (double)plot_x / (double)config.plot_width * config.scale_width + config.scale_x_min;
-	double y_scaled = (double)plot_y / (double)config.plot_height * config.scale_height + config.scale_y_min;
-	double x = 0.0;
-	double y = 0.0;
-	*iteration = 0;
-	while (x*x + y*y < 4 && *iteration < config.max_iteration) {
-		double temp = x*x - y*y + x_scaled;
-		y = 2*x*y + y_scaled;
-		x = temp;
-		*iteration = *iteration + 1;
+#pragma HLS INTERFACE axis port=OUTPUT_STREAM
+#pragma HLS DATAFLOW
+
+	RGB_IMAGE img(config.img_height, config.img_width);
+	int iteration;
+
+	// image coordinates have origin at top left, plot coordinates have origin at bottom left
+	for(int img_y = 0; img_y < img.rows; img_y++) {
+		for(int img_x = 0; img_x < img.cols; img_x++) {
+			double plot_x = (double)img_x / (double)config.img_width * config.plot_width + config.plot_x_min;
+			double plot_y = config.plot_y_max - (double)img_y / (double)config.img_height * config.plot_height;
+			double x = 0.0;
+			double y = 0.0;
+			iteration = 0;
+			while (x*x + y*y < 4 && iteration < config.max_iteration) {
+				double temp = x*x - y*y + plot_x;
+				y = 2*x*y + plot_y;
+				x = temp;
+				iteration = iteration + 1;
+			}
+			if (iteration > 500) {
+				img.write(RGB_PIXEL(255, 255, 255));
+			} else {
+				img.write(RGB_PIXEL(0, 0, 0));
+			}
+		}
 	}
+
+
+
+	hls::Mat2AXIvideo(img, OUTPUT_STREAM);
 }

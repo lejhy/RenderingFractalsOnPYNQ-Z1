@@ -13,3 +13,5 @@
 /overlays/*
 !/overlays/*.xpr
 !/overlays/*.srcs/
+
+/libs/*
