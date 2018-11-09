@@ -30,6 +30,28 @@
                 <option name="port" value="return" positionalBoolean="4"/>
             </pragma>
         </directive>
+        <directive functionName="mandelbrot" label="" functionLabel="">
+            <pragma name="INTERFACE">
+                <option name="s_axilite" value="" positionalBoolean="mode"/>
+                <option name="port" value="config" positionalBoolean="4"/>
+            </pragma>
+        </directive>
+        <directive functionName="mandelbrot" label="" functionLabel="">
+            <pragma name="INTERFACE">
+                <option name="axis" value="" positionalBoolean="mode"/>
+                <option name="register" value="" positionalBoolean="1"/>
+                <option name="port" value="OUTPUT_STREAM" positionalBoolean="4"/>
+            </pragma>
+        </directive>
+        <directive functionName="mandelbrot" label="" functionLabel="">
+            <pragma name="DATAFLOW"/>
+        </directive>
+        <directive functionName="mandelbrot" label="" functionLabel="">
+            <pragma name="INTERFACE">
+                <option name="s_axilite" value="" positionalBoolean="mode"/>
+                <option name="port" value="return" positionalBoolean="4"/>
+            </pragma>
+        </directive>
     </sourceFile>
 </AutoPilot:ProjectResources>
 

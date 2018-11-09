@@ -9,10 +9,10 @@ int main () {
 	Config config;
 	config.img_width = 1920;
 	config.img_height = 1080;
-	config.plot_x_min = -2.5;
-	config.plot_y_max = 0.0;
-	config.plot_width = 3.5;
-	config.plot_height = 2.0;
+	config.plot_x_min = -1.3;
+	config.plot_y_max = 0.35;
+	config.plot_width = 0.35;
+	config.plot_height = 0.2;
 	config.max_iteration = 1000;
 
 	AXI_STREAM img_axi;
