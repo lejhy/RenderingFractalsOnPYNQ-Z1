@@ -4,9 +4,6 @@
 *.log
 /hls/*
 !/hls/source
-!/hls/Mandelbrot
-/hls/Mandelbrot/*
-!/hls/Mandelbrot/*.directive
 
 /overlays/*
 !/overlays/*.tcl

@@ -1,6 +1,10 @@
 #include "Mandelbrot.h"
 
 void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
+#pragma HLS INTERFACE s_axilite port=config
+#pragma HLS INTERFACE axis register both port=OUTPUT_STREAM
+#pragma HLS INTERFACE s_axilite port=return
+#pragma HLS DATAFLOW
 
 	RGB_IMAGE img(config.img_height, config.img_width);
 
