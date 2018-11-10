@@ -4,7 +4,7 @@
 #include "Config.h"
 #include "hls_video.h"
 
-typedef hls::stream<ap_axiu<24,1,1,1> >     AXI_STREAM;
+typedef hls::stream<ap_axiu<32,1,1,1> >     AXI_STREAM;
 typedef hls::Scalar<3, unsigned char>       RGB_PIXEL;
 typedef hls::Mat<1080, 1920, HLS_8UC3>      RGB_IMAGE;
 
