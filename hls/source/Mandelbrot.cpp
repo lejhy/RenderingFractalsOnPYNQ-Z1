@@ -2,7 +2,7 @@
 
 void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 #pragma HLS INTERFACE s_axilite port=config
-#pragma HLS INTERFACE axis register both port=OUTPUT_STREAM
+#pragma HLS INTERFACE axis port=OUTPUT_STREAM
 #pragma HLS INTERFACE s_axilite port=return
 #pragma HLS DATAFLOW
 
@@ -11,6 +11,8 @@ void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 	calculate(config, img);
 
 	hls::Mat2AXIvideo(img, OUTPUT_STREAM);
+
+	return;
 }
 
 void calculate(Config& config, RGB_IMAGE& img) {
