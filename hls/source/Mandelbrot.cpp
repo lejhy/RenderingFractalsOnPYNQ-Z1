@@ -1,7 +1,7 @@
 #include "Mandelbrot.h"
 
 void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
-	#pragma HLS INTERFACE s_axilite port=config
+	#pragma HLS INTERFACE s_axilite register port=config
 	#pragma HLS INTERFACE axis port=OUTPUT_STREAM
 	#pragma HLS INTERFACE s_axilite port=return
 	#pragma HLS DATAFLOW
@@ -33,27 +33,38 @@ void calculate(Config& config, RGB_IMAGE& img) {
 }
 
 void batchProcess(RGB_PIXEL pixel_buffer[PARALLEL_LOOPS], int img_x, int img_y, Config config){
-	#pragma HLS INLINE region
-	#pragma HLS DATAFLOW
+	int max_iter = config.max_iteration;
+	float img_height = (float)config.img_height;
+	float img_width = (float)config.img_width;
+	float plot_height = config.plot_height;
+	float plot_width = config.plot_width;
+	float plot_x_min = config.plot_x_min;
+	float plot_y_max = config.plot_y_max;
+	float plot_y = plot_y_max - img_y / img_height * plot_height;
 
 	for(int i = 0; i < PARALLEL_LOOPS; i++){
 		#pragma HLS UNROLL
-		float plot_x = (float)(img_x + i) / (float)config.img_width * config.plot_width + config.plot_x_min;
-		float plot_y = config.plot_y_max - img_y / (float)config.img_height * config.plot_height;
-		float x = 0.0;
-		float y = 0.0;
-		int iteration = 0;
-		while (x*x + y*y < 4 && iteration < config.max_iteration) {
-			float temp = x*x - y*y + plot_x;
-			y = 2*x*y + plot_y;
-			x = temp;
-			iteration = iteration + 1;
-		}
-		pixel_buffer[i] = getPixel(iteration, config.max_iteration);
+		float plot_x = (img_x + i) / img_width * plot_width + plot_x_min;
+		int iteration = getIteration(plot_x, plot_y, max_iter);
+		pixel_buffer[i] = getPixel(iteration, max_iter);
 	}
 }
 
+int getIteration(float plot_x, float plot_y, int max_iter) {
+	float x = 0.0;
+	float y = 0.0;
+	int iteration = 0;
+	for (int j = 0; j < max_iter; j++) {
+		float temp = x*x - y*y + plot_x;
+		y = 2*x*y + plot_y;
+		x = temp;
+		iteration = iteration + (x*x + y*y < 4 && iteration < max_iter);
+	}
+	return iteration;
+}
+
 RGB_PIXEL getPixel(int& iteration, int& max_iteration) {
+	#pragma HLS INLINE
 	RGB_PIXEL result;
 	if (iteration < max_iteration) {
 		int colour = iteration % 512;
