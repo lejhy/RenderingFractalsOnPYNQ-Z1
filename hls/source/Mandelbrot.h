@@ -12,8 +12,7 @@ typedef hls::Mat<1080, 1920, HLS_8UC3>      RGB_IMAGE;
 
 void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config);
 void calculate(Config& config, RGB_IMAGE& img);
-void batchProcess(RGB_PIXEL pixel_buffer[PARALLEL_LOOPS], int img_x, int img_y, Config config);
-int getIteration(float plot_x, float plot_y, int max_iter);
+void lineProcess(float x_0[], float y_0[], float x[], float y[], int iter[], int img_y, int max_iter, float img_height, float img_width, float plot_height, float plot_width, float plot_x_min, float plot_y_max);
 RGB_PIXEL getPixel(int& iteration, int& max_iteration);
 
 #endif
