@@ -16,37 +16,38 @@ void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 }
 
 void calculate(Config& config, RGB_IMAGE& img) {
-	float x_0[PARALLEL_LOOPS][1920];
+	fixed_32_4_SAT x_0[PARALLEL_LOOPS][WIDTH];
 	#pragma HLS array_partition variable=x_0 complete dim=1
-	float y_0[PARALLEL_LOOPS][1920];
+	fixed_32_4_SAT y_0[PARALLEL_LOOPS][WIDTH];
 	#pragma HLS array_partition variable=y_0 complete dim=1
-	float x[PARALLEL_LOOPS][1920];
+	fixed_32_4_SAT x[PARALLEL_LOOPS][WIDTH];
 	#pragma HLS array_partition variable=x complete dim=1
-	float y[PARALLEL_LOOPS][1920];
+	fixed_32_4_SAT y[PARALLEL_LOOPS][WIDTH];
 	#pragma HLS array_partition variable=y complete dim=1
-	int iter[PARALLEL_LOOPS][1920];
+	int_16 iter[PARALLEL_LOOPS][WIDTH];
 	#pragma HLS array_partition variable=iter complete dim=1
 
-
-	int max_iter = config.max_iteration;
-	float img_height = (float)config.img_height;
-	float img_width = (float)config.img_width;
-	float plot_height = config.plot_height;
-	float plot_width = config.plot_width;
-	float plot_x_min = config.plot_x_min;
-	float plot_y_max = config.plot_y_max;
+	int_16 max_iter = config.max_iteration;
+	int_16 img_height = config.img_height;
+	int_16 img_width = config.img_width;
+	fixed_32_4_SAT plot_height = config.plot_height;
+	fixed_32_4_SAT plot_width = config.plot_width;
+	fixed_32_4_SAT plot_x_min = config.plot_x_min;
+	fixed_32_4_SAT plot_y_max = config.plot_y_max;
+	fixed_32_4_SAT width_fraction = (fixed_32_4_SAT)1 / img_width;
+	fixed_32_4_SAT height_fraction = (fixed_32_4_SAT)1 / img_height;
 
 
 	// image coordinates have origin at top left, plot coordinates have origin at bottom left
-	for(int img_y = 0; img_y < config.img_height; img_y = img_y + PARALLEL_LOOPS) {
+	for(int_16 img_y = 0; img_y < config.img_height; img_y = img_y + PARALLEL_LOOPS) {
 
-		for(int i = 0; i < PARALLEL_LOOPS; i++) {
+		for(int_16 i = 0; i < PARALLEL_LOOPS; i++) {
 			#pragma HLS UNROLL
-			lineProcess(x_0[i], y_0[i], x[i], y[i], iter[i], img_y+i, max_iter, img_height, img_width, plot_height, plot_width, plot_x_min, plot_y_max);
+			lineProcess(x_0[i], y_0[i], x[i], y[i], iter[i], img_y+i, max_iter, img_height, img_width, plot_height, plot_width, plot_x_min, plot_y_max, width_fraction, height_fraction);
 		}
 
-		for(int i = 0; i < PARALLEL_LOOPS; i++){
-			for(int img_x = 0; img_x < 1920; img_x++){
+		for(int_16 i = 0; i < PARALLEL_LOOPS; i++){
+			for(int_16 img_x = 0; img_x < WIDTH; img_x++){
 				#pragma HLS LOOP_FLATTEN
 				img.write(getPixel(iter[i][img_x], max_iter));
 			}
@@ -54,28 +55,44 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	}
 }
 
-void lineProcess(float x_0[], float y_0[], float x[], float y[], int iter[], int img_y, int max_iter, float img_height, float img_width, float plot_height, float plot_width, float plot_x_min, float plot_y_max){
-	for(int img_x = 0; img_x < 1920; img_x++) {
+void lineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x[], fixed_32_4_SAT y[], int_16 iter[], int_16 img_y, int_16 max_iter, int_16 img_height, int_16 img_width, fixed_32_4_SAT plot_height, fixed_32_4_SAT plot_width, fixed_32_4_SAT plot_x_min, fixed_32_4_SAT plot_y_max, fixed_32_4_SAT width_fraction, fixed_32_4_SAT height_fraction){
+
+	for(int_16 img_x = 0; img_x < WIDTH; img_x++) {
 		#pragma HLS PIPELINE
-		x_0[img_x] = img_x / img_width * plot_width + plot_x_min;
-		y_0[img_x] = plot_y_max - img_y / img_height * plot_height;
+		fixed_32_4_SAT x_0_t1 = img_x * width_fraction;
+		fixed_32_4_SAT x_0_t2 = plot_width * x_0_t1;
+
+		x_0[img_x] = x_0_t2 + plot_x_min;
+
+		fixed_32_4_SAT y_0_t1 = img_y * height_fraction;
+		fixed_32_4_SAT y_0_t2 = plot_height * y_0_t1;
+
+		y_0[img_x] = plot_y_max - y_0_t2;
+
 		x[img_x] = 0;
 		y[img_x] = 0;
 		iter[img_x] = 0;
 	}
 
 	for (int j = 0; j < max_iter; j++) {
-		for (int img_x = 0; img_x < 1920; img_x++) {
+		for (int_16 img_x = 0; img_x < WIDTH; img_x++) {
 			#pragma HLS PIPELINE
-			float temp = x[img_x]*x[img_x] - y[img_x]*y[img_x] + x_0[img_x];
-			y[img_x] = 2*x[img_x]*y[img_x] + y_0[img_x];
+			fixed_32_4_SAT x_sq = x[img_x]*x[img_x];
+			fixed_32_4_SAT y_sq = y[img_x]*y[img_x];
+
+			fixed_32_4_SAT temp = x_sq - y_sq + x_0[img_x];
+			fixed_32_4_SAT x_y = x[img_x]*y[img_x];
+			fixed_32_4_SAT x_y_2 = x_y * 2;
+
+			y[img_x] = x_y_2 + y_0[img_x];
 			x[img_x] = temp;
-			iter[img_x] = iter[img_x] + (x[img_x]*x[img_x] + y[img_x]*y[img_x] < 4 && iter[img_x] < max_iter);
+
+			iter[img_x] = iter[img_x] + (x_sq + y_sq < 4);
 		}
 	}
 }
 
-RGB_PIXEL getPixel(int& iteration, int& max_iteration) {
+RGB_PIXEL getPixel(int_16& iteration, int_16& max_iteration) {
 	#pragma HLS INLINE
 	RGB_PIXEL result;
 	if (iteration < max_iteration) {

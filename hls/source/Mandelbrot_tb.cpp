@@ -7,8 +7,8 @@ using namespace std;
 
 int main () {
 	Config config;
-	config.img_width = 1920;
-	config.img_height = 1080;
+	config.img_width = WIDTH;
+	config.img_height = HEIGHT;
 	config.plot_x_min = -1.3;
 	config.plot_y_max = 0.35;
 	config.plot_width = 0.35;
