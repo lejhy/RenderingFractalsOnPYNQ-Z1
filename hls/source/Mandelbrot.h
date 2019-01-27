@@ -5,8 +5,8 @@
 #include "hls_video.h"
 #include "ap_fixed.h"
 
-#define PARALLEL_LOOPS 		5
-#define PARALLEL_SUB_LOOPS 	4
+#define PARALLEL_LOOPS 		8
+#define PARALLEL_SUB_LOOPS 	2
 #define WIDTH 				1920
 #define HEIGHT				1080
 #define SUB_LOOP_WIDTH 		WIDTH / PARALLEL_SUB_LOOPS
