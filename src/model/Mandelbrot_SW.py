@@ -1,4 +1,3 @@
-
 class Mandelbrot:
 
     def calculate(self, x_scale, y_scale, plot_width, plot_height, max_iteration):

@@ -1,5 +1,6 @@
 import struct
 
+
 class Mandelbrot:
 
     def __init__(self, ip):
