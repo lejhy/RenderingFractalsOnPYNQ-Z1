@@ -10,7 +10,7 @@ class Mandelbrot:
             for plot_y in range(plot_height):
                 """calculate pixels"""
                 x_scaled = plot_x / plot_width * scale_width + x_scale[0]
-                y_scaled = plot_y / plot_height * scale_height + y_scale[0]
+                y_scaled = y_scale[1] - plot_y / plot_height * scale_height
                 x = 0.0
                 y = 0.0
                 iteration = 0
