@@ -3,6 +3,6 @@
 
 #include "Config.h"
 
-void calc_pixel(int plot_x, int plot_y, int* iteration, Config& config);
+void calc_pixel(int img_x, int img_y, int* iteration, Config& config);
 
 #endif

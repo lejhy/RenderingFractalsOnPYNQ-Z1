@@ -5,15 +5,22 @@
 using namespace std;
 
 int main () {
-	Config config;
-	set_config (1920, 1080, -2.5, 1.0, -1.0, 1.0, 1000, config);
-	int iteration;
-	calc_pixel(0, 0, &iteration, config);
+  Config config;
+  config.img_width = 1920;
+  config.img_height = 1080;
+  config.plot_x_min = -1.3;
+  config.plot_y_max = 0.35;
+  config.plot_width = 0.35;
+  config.plot_height = 0.2;
+  config.max_iteration = 1000;
 
-	cout << iteration << endl;
+  int iteration;
 
-	calc_pixel(960, 540, &iteration, config);
+  calc_pixel(0, 0, &iteration, config);
+  cout << iteration << endl;
 
-	cout << iteration << endl;
-	return 0;
+  calc_pixel(960, 540, &iteration, config);
+  cout << iteration << endl;
+
+  return 0;
 }

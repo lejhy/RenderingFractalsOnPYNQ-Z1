@@ -2,13 +2,13 @@
 #define _CONFIG_H_
 
 struct Config {
-	int plot_width;
-	int plot_height;
-	double scale_width;
-	double scale_height;
-	double scale_x_min;
-	double scale_y_max;
-	int max_iteration;
+  int img_width;
+  int img_height;
+  float plot_width;
+  float plot_height;
+  float plot_x_min;
+  float plot_y_max;
+  int max_iteration;
 };
 
 #endif
