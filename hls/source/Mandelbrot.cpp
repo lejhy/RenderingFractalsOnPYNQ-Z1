@@ -7,9 +7,7 @@ void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 	#pragma HLS DATAFLOW
 
 	RGB_IMAGE img(config.img_height, config.img_width);
-
 	calculate(config, img);
-
 	hls::Mat2AXIvideo(img, OUTPUT_STREAM);
 
 	return;
@@ -43,25 +41,25 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	fixed_32_4_SAT width_fraction = (fixed_32_4_SAT)1 / img_width;
 	fixed_32_4_SAT height_fraction = (fixed_32_4_SAT)1 / img_height;
 
-	// image coordinates have origin at top left, plot coordinates have origin at bottom left
 	for(int_16 img_y = 0; img_y <= img_height; img_y = img_y + PARALLEL_LOOPS) {
+		// '<=' used since one extra loop is needed for img.write at the end
 
-		for(int_16 i = 0; i < PARALLEL_LOOPS; i++){ //one extra loop needed for img.write
-
+		for(int_16 i = 0; i < PARALLEL_LOOPS; i++){// MAINTENANCE LOOP
 			int_16 img_x_offset = 0;
 
 			for(int_16 j = 0; j < PARALLEL_SUB_LOOPS; j++){
-
 				for(int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++){
 					#pragma HLS LOOP_FLATTEN
 					#pragma HLS PIPELINE
 
 
-					if (img_y != 0) {
+					if (img_y != 0) {// IMAGE WRITING CODE
+						// nothing to write at beginning of first loop
 						img.write(getPixel(iter[i][j][sub_x], max_iter));
 					}
 
-					if (img_y != img_height) {
+					if (img_y != img_height) {// INITIALISATION CODE
+						// nothing to initialise during the extra loop
 
 						int_16 img_x = img_x_offset + sub_x;
 						fixed_32_4_SAT x_0_t1 = img_x * width_fraction;
@@ -69,7 +67,8 @@ void calculate(Config& config, RGB_IMAGE& img) {
 
 						x_0[i][j][sub_x] = x_0_t2 + plot_x_min;
 
-						fixed_32_4_SAT y_0_t1 = (img_y+i) * height_fraction; //use current img_y value (img_y+i)
+						// use current img_y pixel row number (img_y+i)
+						fixed_32_4_SAT y_0_t1 = (img_y+i) * height_fraction;
 						fixed_32_4_SAT y_0_t2 = plot_height * y_0_t1;
 
 						y_0[i][j][sub_x] = plot_y_max - y_0_t2;
@@ -85,7 +84,9 @@ void calculate(Config& config, RGB_IMAGE& img) {
 		}
 
 		if (img_y != img_height) {
-			for(int_16 i = 0; i < PARALLEL_LOOPS; i++) {
+			// nothing to process during the extra loop
+
+			for(int_16 i = 0; i < PARALLEL_LOOPS; i++) {// PROCESSING LOOP
 				#pragma HLS UNROLL
 				for (int_16 j = 0; j < PARALLEL_SUB_LOOPS; j++) {
 					#pragma HLS UNROLL
@@ -98,7 +99,6 @@ void calculate(Config& config, RGB_IMAGE& img) {
 }
 
 void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x[], fixed_32_4_SAT y[], int_16 iter[], int_16 max_iter){
-
 	for (int j = 0; j < max_iter; j++) {
 		for (int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++) {
 			#pragma HLS PIPELINE
@@ -115,7 +115,6 @@ void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x
 			iter[sub_x] = iter[sub_x] + (x_sq + y_sq < 4);
 		}
 	}
-
 }
 
 RGB_PIXEL getPixel(int_16& iteration, int_16& max_iteration) {
