@@ -9,8 +9,6 @@ void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 	RGB_IMAGE img(config.img_height, config.img_width);
 	calculate(config, img);
 	hls::Mat2AXIvideo(img, OUTPUT_STREAM);
-
-	return;
 }
 
 void calculate(Config& config, RGB_IMAGE& img) {
@@ -51,7 +49,6 @@ void calculate(Config& config, RGB_IMAGE& img) {
 				for(int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++){
 					#pragma HLS LOOP_FLATTEN
 					#pragma HLS PIPELINE
-
 
 					if (img_y != 0) {// IMAGE WRITING CODE
 						// nothing to write at beginning of first loop
