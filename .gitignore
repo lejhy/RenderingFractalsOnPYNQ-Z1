@@ -12,3 +12,12 @@
 !/overlays/PYNQ-Z1.srcs/constrs_1/
 
 /libs/*
+
+/cpp/*
+!/cpp/Mandelbrot/
+!/cpp/x64/
+/cpp/x64/Debug/*
+!/cpp/x64/Debug/*.pyd
+
+/cpp/Mandelbrot/*
+!/cpp/Mandelbrot/*.cpp
