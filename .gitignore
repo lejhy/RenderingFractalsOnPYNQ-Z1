@@ -21,3 +21,5 @@
 
 /cpp/Mandelbrot/*
 !/cpp/Mandelbrot/*.cpp
+
+*.pyc
