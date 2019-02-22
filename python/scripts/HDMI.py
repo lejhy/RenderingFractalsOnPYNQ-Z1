@@ -1,3 +1,8 @@
+import sys
+
+sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/drivers")
+sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/scripts")
+
 import Mandelbrot
 import AxiVDMA_Custom
 
