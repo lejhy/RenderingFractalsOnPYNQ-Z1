@@ -2,6 +2,7 @@ from pynq import DefaultIP
 import time
 import PIL.Image
 import asyncio
+import struct
 
 class Mandelbrot(DefaultIP):
     def __init__(self, description):
