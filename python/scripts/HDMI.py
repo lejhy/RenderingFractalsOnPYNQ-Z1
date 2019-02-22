@@ -1,6 +1,7 @@
 import Mandelbrot
 import AxiVDMA_Custom
 
+from pynq.lib.video import *
 from pynq import Overlay
 
 overlay = Overlay('/home/xilinx/pynq/overlays/personal/Mandelbrot/Mandelbrot.bit')
