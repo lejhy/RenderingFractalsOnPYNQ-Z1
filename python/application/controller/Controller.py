@@ -28,8 +28,12 @@ class Controller:
             password = getpass.getpass("Password: ", stream=None)
             self.ssh.connect(hostname=hostname, username=username, password=password)
             self.shell = self.ssh.invoke_shell()
-
-
+            self.shell.send("su\n")
+            self.shell.send(password+"\n")
+            self.shell.send("cd RenderingFractalsOnPYNQ-Z1/python/scripts/\n")
+            self.shell.send("python3\n")
+            self.shell.send("from HDMI import *\n")
+            self.model.shell = self.shell
 
         self.start = {'x': 0, 'y': 0}
         self.end = {'x': 0, 'y': 0}
