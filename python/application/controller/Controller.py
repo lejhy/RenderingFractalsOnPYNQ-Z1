@@ -36,7 +36,10 @@ class Controller:
             self.shell.send("cd RenderingFractalsOnPYNQ-Z1/python/scripts/\n")
             self.shell.send("python3\n")
             self.shell.send("from HDMI import *\n")
-            self.model.shell = self.shell
+        else:
+            self.shell = False
+
+        self.model.shell = self.shell
 
         self.start = {'x': 0, 'y': 0}
         self.end = {'x': 0, 'y': 0}
@@ -45,11 +48,13 @@ class Controller:
         sys.exit(self.exit(view.app.exec_()))
 
     def exit(self, return_code):
-        self.shell.send("renderer.exit()")
+        if self.shell:
+            self.shell.send("renderer.exit()")
         return return_code
 
     def update(self):
-        print(self.shell.recv(1024))
+        if self.shell:
+            print(self.shell.recv(1024))
         start = time.time()
         result = self.model.calculate()
         end = time.time()
