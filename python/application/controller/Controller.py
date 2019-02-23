@@ -42,7 +42,11 @@ class Controller:
         self.end = {'x': 0, 'y': 0}
         self.update()
 
-        sys.exit(view.app.exec_())
+        sys.exit(self.exit(view.app.exec_()))
+
+    def exit(self, return_code):
+        self.shell.send("renderer.exit()")
+        return return_code
 
     def update(self):
         print(self.shell.recv(1024))

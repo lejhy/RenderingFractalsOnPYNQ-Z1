@@ -29,3 +29,7 @@ class Renderer:
         # Stream to HDMI
         frame = self.get_active_frame()
         self.hdmi_out.writeframe(frame)
+
+    def exit(self):
+        self.hdmi_out.stop()
+        self.vdma.readchannel.stop()
