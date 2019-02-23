@@ -5,7 +5,7 @@ sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/scripts")
 
 import Mandelbrot
 import AxiVDMA_Custom
-from Renderer import Rendererx
+from Renderer import Renderer
 
 from pynq.lib.video import *
 from pynq import Overlay
