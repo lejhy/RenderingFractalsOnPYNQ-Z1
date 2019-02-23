@@ -23,6 +23,7 @@ class Mandelbrot_CPP:
         self.plot_height = self._plot_height
         self.plot_x_min = self._plot_x_min
         self.plot_y_max = self._plot_y_max
+        self.max_iteration = self._max_iteration
 
     @property
     def img_width(self):
