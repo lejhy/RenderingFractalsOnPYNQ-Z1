@@ -91,7 +91,7 @@ class Mandelbrot_CPP:
             self._shell.send("mandelbrot.set_max_iteration(%i)\n" % self._max_iteration)
 
     def calculate(self):
-        self._shell.send("mandelbrot.render()\n")
+        self._shell.send("renderer.render_to_hdmi()\n")
         return Mandelbrot.calculate(
             self._img_width,
             self._img_height,

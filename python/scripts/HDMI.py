@@ -3,9 +3,9 @@ import sys
 sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/drivers")
 sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/scripts")
 
-import Renderer
 import Mandelbrot
 import AxiVDMA_Custom
+from Renderer import Rendererx
 
 from pynq.lib.video import *
 from pynq import Overlay
