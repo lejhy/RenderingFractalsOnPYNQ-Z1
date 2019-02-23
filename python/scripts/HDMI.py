@@ -3,6 +3,7 @@ import sys
 sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/drivers")
 sys.path.append("/home/xilinx/RenderingFractalsOnPYNQ-Z1/python/scripts")
 
+import Renderer
 import Mandelbrot
 import AxiVDMA_Custom
 
@@ -20,4 +21,5 @@ vdma.readchannel.mode = common.VideoMode(1920, 1080, 32)
 hdmi_out.configure(common.VideoMode(1920, 1080, 32))
 vdma.readchannel.start()
 hdmi_out.start()
-vdma.readchannel.tie(vdma.writechannel)
+
+renderer = Renderer(mandelbrot, vdma, hdmi_out)

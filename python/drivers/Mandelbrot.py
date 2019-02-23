@@ -1,6 +1,5 @@
 from pynq import DefaultIP
-import time
-import PIL.Image
+
 import asyncio
 import struct
 
@@ -40,21 +39,7 @@ class Mandelbrot(DefaultIP):
     def set_max_iteration(self, max_iteration):
         self.write(0x40,max_iteration)
 
-    def get_render(self):
-        self.render()
-        # Get output
-        activeframe = vdma.readchannel.activeframe
-        frame = vdma.readchannel._frames[activeframe]
-        return PIL.Image.fromarray(frame)
-
-    def timed_get_render(self):
-        start = time.time()
-        render = self.get_render()
-        end = time.time()
-        print("Render took:", end - start, "s")
-        return render
-
-    def render(self):
+    def calculate(self):
         # Start IP
         self.write(0x00,1)
         # Wait for interrupt
@@ -64,3 +49,4 @@ class Mandelbrot(DefaultIP):
         # Clear interrupt
         self.write(0x0c, 0x1)
         self.interrupt.event.clear()
+

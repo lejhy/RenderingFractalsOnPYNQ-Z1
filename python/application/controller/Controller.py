@@ -28,7 +28,10 @@ class Controller:
             password = getpass.getpass("Password: ", stream=None)
             self.ssh.connect(hostname=hostname, username=username, password=password)
             self.shell = self.ssh.invoke_shell()
+            recv = self.shell.recv(1024)
             self.shell.send("su\n")
+            while b"Password:" not in recv:
+                recv = self.shell.recv(1024)
             self.shell.send(password+"\n")
             self.shell.send("cd RenderingFractalsOnPYNQ-Z1/python/scripts/\n")
             self.shell.send("python3\n")
@@ -42,6 +45,7 @@ class Controller:
         sys.exit(view.app.exec_())
 
     def update(self):
+        print(self.shell.recv(1024))
         start = time.time()
         result = self.model.calculate()
         end = time.time()

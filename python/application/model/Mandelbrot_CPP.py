@@ -48,7 +48,7 @@ class Mandelbrot_CPP:
     def plot_width(self, value):
         self._plot_width = value
         if self._shell:
-            self._shell.send("mandelbrot.set_plot_width("+self._plot_width+")\n")
+            self._shell.send("mandelbrot.set_plot_width(%f)\n" % self._plot_width)
 
     @property
     def plot_height(self):
@@ -58,7 +58,7 @@ class Mandelbrot_CPP:
     def plot_height(self, value):
         self._plot_height = value
         if self._shell:
-            self._shell.send("mandelbrot.set_plot_height("+self._plot_height+")\n")
+            self._shell.send("mandelbrot.set_plot_height(%f)\n" % self._plot_height)
 
     @property
     def plot_x_min(self):
@@ -68,7 +68,7 @@ class Mandelbrot_CPP:
     def plot_x_min(self, value):
         self._plot_x_min = value
         if self._shell:
-            self._shell.send("mandelbrot.set_plot_x_min("+self._plot_x_min+")\n")
+            self._shell.send("mandelbrot.set_plot_x_min(%f)\n" % self._plot_x_min)
 
     @property
     def plot_y_max(self):
@@ -78,7 +78,7 @@ class Mandelbrot_CPP:
     def plot_y_max(self, value):
         self._plot_y_max = value
         if self._shell:
-            self._shell.send("mandelbrot.set_plot_y_max("+self._plot_y_max+")\n")
+            self._shell.send("mandelbrot.set_plot_y_max(%f)\n" % self._plot_y_max)
 
     @property
     def max_iteration(self):
@@ -88,7 +88,7 @@ class Mandelbrot_CPP:
     def max_iteration(self, value):
         self._max_iteration = value
         if self._shell:
-            self._shell.send("mandelbrot.set_max_iteration("+self._max_iteration+")\n")
+            self._shell.send("mandelbrot.set_max_iteration(%i)\n" % self._max_iteration)
 
     def calculate(self):
         self._shell.send("mandelbrot.render()\n")
