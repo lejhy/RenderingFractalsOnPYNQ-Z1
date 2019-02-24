@@ -103,7 +103,8 @@ class Mandelbrot_CPP:
     @colour_span.setter
     def colour_span(self, value):
         self._colour_span = value
-        #TODO ADD SHELL CALL
+        if self._shell:
+            self._shell.send("mandelbrot.set_colour_span(%i)\n" % self._colour_span)
 
     @property
     def colour_0(self):
@@ -112,7 +113,8 @@ class Mandelbrot_CPP:
     @colour_0.setter
     def colour_0(self, value):
         self._colour_0 = value
-        #TODO ADD SHELL CALL
+        if self._shell:
+            self._shell.send("mandelbrot.set_colour_0(%i)\n" % self._colour_0)
 
     @property
     def colour_1(self):
@@ -121,7 +123,8 @@ class Mandelbrot_CPP:
     @colour_1.setter
     def colour_1(self, value):
         self._colour_1 = value
-        #TODO ADD SHELL CALL
+        if self._shell:
+            self._shell.send("mandelbrot.set_colour_1(%i)\n" % self._colour_1)
 
     @property
     def colour_2(self):
@@ -130,7 +133,8 @@ class Mandelbrot_CPP:
     @colour_2.setter
     def colour_2(self, value):
         self._colour_2 = value
-        #TODO ADD SHELL CALL
+        if self._shell:
+            self._shell.send("mandelbrot.set_colour_2(%i)\n" % self._colour_2)
 
     @property
     def colour_3(self):
@@ -139,7 +143,8 @@ class Mandelbrot_CPP:
     @colour_3.setter
     def colour_3(self, value):
         self._colour_3 = value
-        #TODO ADD SHELL CALL
+        if self._shell:
+            self._shell.send("mandelbrot.set_colour_3(%i)\n" % self._colour_3)
 
     def calculate(self):
         if self.shell:
