@@ -30,6 +30,6 @@ class Renderer:
         frame = self.get_active_frame()
         self.hdmi_out.writeframe(frame)
 
-    def exit(self):
-        self.hdmi_out.stop()
+    def cleanup(self):
+        self.hdmi_out.close()
         self.vdma.readchannel.stop()

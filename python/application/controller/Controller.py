@@ -59,7 +59,12 @@ class Controller:
 
     def exit(self, return_code):
         if self.shell:
-            self.shell.send("renderer.exit()")
+            self.shell.send("renderer.close()\n")
+            print(self.shell.recv(1024))
+            self.shell.send("exit()\n")
+            print(self.shell.recv(1024))
+            self.shell.send("exit\n")
+            print(self.shell.recv(1024))
         return return_code
 
     def update(self):
