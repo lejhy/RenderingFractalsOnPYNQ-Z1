@@ -101,7 +101,11 @@ class Mandelbrot_CPP:
             self._plot_height,
             self._plot_x_min,
             self._plot_y_max,
-            self._max_iteration
+            self._max_iteration,
+            0x0044b4ff,
+            0x00af007e,
+            0x00420020,
+            0x00FFFFFF
         )
 
 

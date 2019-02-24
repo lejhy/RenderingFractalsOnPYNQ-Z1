@@ -10,7 +10,19 @@ namespace bp = boost::python;
 namespace np = boost::python::numpy;
 namespace cp = boost::compute;
 
-np::ndarray calculate(int img_width, int img_height, double plot_width, double plot_height, double plot_x_min, double plot_y_max, int max_iteration) {
+np::ndarray calculate(
+	int img_width, 
+	int img_height, 
+	double plot_width, 
+	double plot_height, 
+	double plot_x_min, 
+	double plot_y_max, 
+	int max_iteration, 
+	unsigned int colour_0,
+	unsigned int colour_1,
+	unsigned int colour_2,
+	unsigned int colour_3
+) {
 	
 	Py_intptr_t shape[3] = { img_height, img_width, 3 };
 	np::ndarray img = np::empty(3, shape, np::dtype::get_builtin<uint8_t>());
@@ -18,6 +30,19 @@ np::ndarray calculate(int img_width, int img_height, double plot_width, double p
 
 	double width_fraction = 1.0 / img_width * plot_width;
 	double height_fraction = 1.0 / img_height * plot_height;
+
+	int colour_0_r = (unsigned char)(colour_0);
+	int colour_0_g = (unsigned char)(colour_0 >> 8);
+	int colour_0_b = (unsigned char)(colour_0 >> 16);
+	int colour_1_r = (unsigned char)(colour_1);
+	int colour_1_g = (unsigned char)(colour_1 >> 8);
+	int colour_1_b = (unsigned char)(colour_1 >> 16);
+	int colour_2_r = (unsigned char)(colour_2);
+	int colour_2_g = (unsigned char)(colour_2 >> 8);
+	int colour_2_b = (unsigned char)(colour_2 >> 16);
+	int colour_3_r = (unsigned char)(colour_3);
+	int colour_3_g = (unsigned char)(colour_3 >> 8);
+	int colour_3_b = (unsigned char)(colour_3 >> 16);
 
 	cp::device device = cp::system::default_device();
 	cp::context context = cp::context(device);
@@ -38,7 +63,19 @@ np::ndarray calculate(int img_width, int img_height, double plot_width, double p
 		"	const double height_fraction,"
 		"	const double plot_x_min,"
 		"	const double plot_y_max,"
-		"	const int max_iteration"
+		"	const int max_iteration,"
+		"	const int colour_0_r,"
+		"	const int colour_0_g,"
+		"	const int colour_0_b,"
+		"	const int colour_1_r,"
+		"	const int colour_1_g,"
+		"	const int colour_1_b,"
+		"	const int colour_2_r,"
+		"	const int colour_2_g,"
+		"	const int colour_2_b,"
+		"	const int colour_3_r,"
+		"	const int colour_3_g,"
+		"	const int colour_3_b"
 		") {"
 		"	const uint id = get_global_id(0);"
 		"	const uint i = id * 3;"
@@ -66,23 +103,26 @@ np::ndarray calculate(int img_width, int img_height, double plot_width, double p
 		"		iteration++;"
 		"	}"
 		"	if (iteration < max_iteration) {"
-		"		int colour = iteration % 512;"
-		"		if (colour > 255) {"
-		"			colour = colour - 256;"
-		"			data[i] = colour;"
-		"			data[i + 1] = 0xFF;"
-		"			data[i + 2] = colour;"
-		"		}"
-		"		else {"
-		"			data[i] = 0x00;"
-		"			data[i + 1] = colour;"
-		"			data[i + 2] = 0x00;"
+		"		int bits_per_colour = 8;"
+		"		int intensity = iteration % (1 << bits_per_colour);"
+		"		if (iteration < (1 << bits_per_colour)) {"
+		"			data[i]     = colour_0_r + (((colour_1_r - colour_0_r) * intensity) >> bits_per_colour);"
+		"			data[i + 1] = colour_0_g + (((colour_1_g - colour_0_g) * intensity) >> bits_per_colour);"
+		"			data[i + 2] = colour_0_b + (((colour_1_b - colour_0_b) * intensity) >> bits_per_colour);"
+		"		} else if (iteration < (2 << bits_per_colour)){"
+		"			data[i]     = colour_1_r + (((colour_2_r - colour_1_r) * intensity) >> bits_per_colour);"
+		"			data[i + 1] = colour_1_g + (((colour_2_g - colour_1_g) * intensity) >> bits_per_colour);"
+		"			data[i + 2] = colour_1_b + (((colour_2_b - colour_1_b) * intensity) >> bits_per_colour);"
+		"		} else {"
+		"			data[i]     = colour_2_r;"
+		"			data[i + 1] = colour_2_g;"
+		"			data[i + 2] = colour_2_b;"
 		"		}"
 		"	}"
 		"	else {"
-		"		data[i] = 0x00;"
-		"		data[i + 1] = 0x00;"
-		"		data[i + 2] = 0x00;"
+		"		data[i]     = colour_3_r;"
+		"		data[i + 1] = colour_3_g;"
+		"		data[i + 2] = colour_3_b;"
 		"	}"
 		"}";
 	boost::shared_ptr<cp::program_cache> global_cache = cp::program_cache::get_global_cache(context);
@@ -90,7 +130,28 @@ np::ndarray calculate(int img_width, int img_height, double plot_width, double p
 	std::string key = "__pynq_mandelbrot";
 	cp::program program = global_cache->get_or_build(key, options, source, context);
 	cp::kernel kernel = program.create_kernel("mandelbrot");
-	kernel.set_args(device_vector, img_width, img_height, width_fraction, height_fraction, plot_x_min, plot_y_max, max_iteration);
+	kernel.set_args(
+		device_vector, 
+		img_width, 
+		img_height, 
+		width_fraction, 
+		height_fraction, 
+		plot_x_min, 
+		plot_y_max, 
+		max_iteration, 
+		colour_0_r,
+		colour_0_g,
+		colour_0_b,
+		colour_1_r,
+		colour_1_g,
+		colour_1_b,
+		colour_2_r,
+		colour_2_g,
+		colour_2_b,
+		colour_3_r,
+		colour_3_g,
+		colour_3_b
+	);
 
 	queue.enqueue_1d_range_kernel(kernel, 0, num_of_pixels, 0);
 

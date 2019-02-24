@@ -13,7 +13,7 @@ class PyQtView:
         self.selection = QRubberBand(QRubberBand.Rectangle, self.label)
         self.iteration = QSpinBox(self.label)
         self.iteration.setMinimum(1)
-        self.iteration.setMaximum(10000)
+        self.iteration.setMaximum(100000)
         self.iteration.setMinimumWidth(50)
         self.window.setCentralWidget(self.label)
         self.window.show()
