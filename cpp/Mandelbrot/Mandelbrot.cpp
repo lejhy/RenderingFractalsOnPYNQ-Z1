@@ -17,7 +17,8 @@ np::ndarray calculate(
 	double plot_height, 
 	double plot_x_min, 
 	double plot_y_max, 
-	int max_iteration, 
+	unsigned int max_iteration,
+	unsigned int colour_span,
 	unsigned int colour_0,
 	unsigned int colour_1,
 	unsigned int colour_2,
@@ -31,18 +32,18 @@ np::ndarray calculate(
 	double width_fraction = 1.0 / img_width * plot_width;
 	double height_fraction = 1.0 / img_height * plot_height;
 
-	int colour_0_r = (unsigned char)(colour_0);
+	int colour_0_r = (unsigned char)(colour_0 >> 16);
 	int colour_0_g = (unsigned char)(colour_0 >> 8);
-	int colour_0_b = (unsigned char)(colour_0 >> 16);
-	int colour_1_r = (unsigned char)(colour_1);
+	int colour_0_b = (unsigned char)(colour_0);
+	int colour_1_r = (unsigned char)(colour_1 >> 16);
 	int colour_1_g = (unsigned char)(colour_1 >> 8);
-	int colour_1_b = (unsigned char)(colour_1 >> 16);
-	int colour_2_r = (unsigned char)(colour_2);
+	int colour_1_b = (unsigned char)(colour_1);
+	int colour_2_r = (unsigned char)(colour_2 >> 16);
 	int colour_2_g = (unsigned char)(colour_2 >> 8);
-	int colour_2_b = (unsigned char)(colour_2 >> 16);
-	int colour_3_r = (unsigned char)(colour_3);
+	int colour_2_b = (unsigned char)(colour_2);
+	int colour_3_r = (unsigned char)(colour_3 >> 16);
 	int colour_3_g = (unsigned char)(colour_3 >> 8);
-	int colour_3_b = (unsigned char)(colour_3 >> 16);
+	int colour_3_b = (unsigned char)(colour_3);
 
 	cp::device device = cp::system::default_device();
 	cp::context context = cp::context(device);
@@ -64,6 +65,7 @@ np::ndarray calculate(
 		"	const double plot_x_min,"
 		"	const double plot_y_max,"
 		"	const int max_iteration,"
+		"	const int colour_span,"
 		"	const int colour_0_r,"
 		"	const int colour_0_g,"
 		"	const int colour_0_b,"
@@ -103,16 +105,15 @@ np::ndarray calculate(
 		"		iteration++;"
 		"	}"
 		"	if (iteration < max_iteration) {"
-		"		int bits_per_colour = 8;"
-		"		int intensity = iteration % (1 << bits_per_colour);"
-		"		if (iteration < (1 << bits_per_colour)) {"
-		"			data[i]     = colour_0_r + (((colour_1_r - colour_0_r) * intensity) >> bits_per_colour);"
-		"			data[i + 1] = colour_0_g + (((colour_1_g - colour_0_g) * intensity) >> bits_per_colour);"
-		"			data[i + 2] = colour_0_b + (((colour_1_b - colour_0_b) * intensity) >> bits_per_colour);"
-		"		} else if (iteration < (2 << bits_per_colour)){"
-		"			data[i]     = colour_1_r + (((colour_2_r - colour_1_r) * intensity) >> bits_per_colour);"
-		"			data[i + 1] = colour_1_g + (((colour_2_g - colour_1_g) * intensity) >> bits_per_colour);"
-		"			data[i + 2] = colour_1_b + (((colour_2_b - colour_1_b) * intensity) >> bits_per_colour);"
+		"		int intensity = iteration % (1 << colour_span);"
+		"		if (iteration < (1 << colour_span)) {"
+		"			data[i]     = colour_0_r + (((colour_1_r - colour_0_r) * intensity) >> colour_span);"
+		"			data[i + 1] = colour_0_g + (((colour_1_g - colour_0_g) * intensity) >> colour_span);"
+		"			data[i + 2] = colour_0_b + (((colour_1_b - colour_0_b) * intensity) >> colour_span);"
+		"		} else if (iteration < (2 << colour_span)){"
+		"			data[i]     = colour_1_r + (((colour_2_r - colour_1_r) * intensity) >> colour_span);"
+		"			data[i + 1] = colour_1_g + (((colour_2_g - colour_1_g) * intensity) >> colour_span);"
+		"			data[i + 2] = colour_1_b + (((colour_2_b - colour_1_b) * intensity) >> colour_span);"
 		"		} else {"
 		"			data[i]     = colour_2_r;"
 		"			data[i + 1] = colour_2_g;"
@@ -138,7 +139,8 @@ np::ndarray calculate(
 		height_fraction, 
 		plot_x_min, 
 		plot_y_max, 
-		max_iteration, 
+		max_iteration,
+		colour_span,
 		colour_0_r,
 		colour_0_g,
 		colour_0_b,

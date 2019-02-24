@@ -15,6 +15,16 @@ class Controller:
         view.label.mouseReleaseEvent = self.handleMouseReleaseEvent
         view.iteration.setValue(model.max_iteration)
         view.iteration.valueChanged.connect(self.handleIterationChange)
+        view.colour_span.setValue(model.colour_span)
+        view.colour_span.valueChanged.connect(self.handleColourSpanChange)
+        view.colour_0.mousePressEvent = self.handleColour0MousePressEvent
+        view.colour_1.mousePressEvent = self.handleColour1MousePressEvent
+        view.colour_2.mousePressEvent = self.handleColour2MousePressEvent
+        view.colour_3.mousePressEvent = self.handleColour3MousePressEvent
+        view.colour_button(self.view.colour_0, self.model.colour_0)
+        view.colour_button(self.view.colour_1, self.model.colour_1)
+        view.colour_button(self.view.colour_2, self.model.colour_2)
+        view.colour_button(self.view.colour_3, self.model.colour_3)
 
         #ssh
         should_connect = input("Connect SSH? (y/n): ")
@@ -106,8 +116,33 @@ class Controller:
         self.view.move_selection(event.localPos().x(), event.localPos().y())
 
     def handleIterationChange(self, value):
-        print(value)
         self.model.max_iteration = value
+        self.update()
+
+    def handleColourSpanChange(self, value):
+        self.model.colour_span = value
+        self.update()
+
+    def processColourButtonPress(self, button, initial_colour):
+        colour = self.view.get_color(initial_colour)
+        self.view.colour_button(button, colour)
+        return colour
+
+    def handleColour0MousePressEvent(self, event):
+        self.model.colour_0 = self.processColourButtonPress(self.view.colour_0, self.model.colour_0)
+        self.update()
+
+    def handleColour1MousePressEvent(self, event):
+        self.model.colour_1 = self.processColourButtonPress(self.view.colour_1, self.model.colour_1)
+        self.update()
+
+    def handleColour2MousePressEvent(self, event):
+        self.model.colour_2 = self.processColourButtonPress(self.view.colour_2, self.model.colour_2)
+        self.update()
+
+    def handleColour3MousePressEvent(self, event):
+        self.model.colour_3 = self.processColourButtonPress(self.view.colour_3, self.model.colour_3)
+        self.update()
 
     def getCoords(self, event):
         pos = event.localPos()

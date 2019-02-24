@@ -10,6 +10,11 @@ class Mandelbrot_CPP:
         self._plot_x_min = -2.5
         self._plot_y_max = 1.0
         self._max_iteration = 1000
+        self._colour_span = 8
+        self._colour_0 = 0x00ffb444
+        self._colour_1 = 0x007e00af
+        self._colour_2 = 0x00200042
+        self._colour_3 = 0x00FFFFFF
         self._shell = False
 
     @property
@@ -91,6 +96,51 @@ class Mandelbrot_CPP:
         if self._shell:
             self._shell.send("mandelbrot.set_max_iteration(%i)\n" % self._max_iteration)
 
+    @property
+    def colour_span(self):
+        return self._colour_span
+
+    @colour_span.setter
+    def colour_span(self, value):
+        self._colour_span = value
+        #TODO ADD SHELL CALL
+
+    @property
+    def colour_0(self):
+        return self._colour_0
+
+    @colour_0.setter
+    def colour_0(self, value):
+        self._colour_0 = value
+        #TODO ADD SHELL CALL
+
+    @property
+    def colour_1(self):
+        return self._colour_1
+
+    @colour_1.setter
+    def colour_1(self, value):
+        self._colour_1 = value
+        #TODO ADD SHELL CALL
+
+    @property
+    def colour_2(self):
+        return self._colour_2
+
+    @colour_2.setter
+    def colour_2(self, value):
+        self._colour_2 = value
+        #TODO ADD SHELL CALL
+
+    @property
+    def colour_3(self):
+        return self._colour_3
+
+    @colour_3.setter
+    def colour_3(self, value):
+        self._colour_3 = value
+        #TODO ADD SHELL CALL
+
     def calculate(self):
         if self.shell:
             self._shell.send("renderer.render_to_hdmi()\n")
@@ -102,10 +152,11 @@ class Mandelbrot_CPP:
             self._plot_x_min,
             self._plot_y_max,
             self._max_iteration,
-            0x0044b4ff,
-            0x00af007e,
-            0x00420020,
-            0x00FFFFFF
+            self._colour_span,
+            self._colour_0,
+            self._colour_1,
+            self._colour_2,
+            self._colour_3
         )
 
 
