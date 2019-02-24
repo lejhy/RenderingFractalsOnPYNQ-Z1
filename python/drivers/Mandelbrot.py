@@ -13,22 +13,24 @@ class Mandelbrot(DefaultIP):
         self.write(0x04,1)
         self.write(0x08,1)
         # Setup default config
-        self.config(3.5, 2.0, -2.5, 1.0, 100)
+        self.set_width_fraction(3.5/1920)
+        self.set_height_fraction(2.0/1080)
+        self.set_plot_x_min(-2.5)
+        self.set_plot_y_max(1.0)
+        self.set_max_iteration(512)
+        self.set_colour_span(8)
+        self.set_colour_0(0xFFFFFF)
+        self.set_colour_1(0x888888)
+        self.set_colour_2(0x000000)
+        self.set_colour_3(0xFFFFFF)
 
     bindto = ['xilinx.com:hls:mandelbrot:1.0']
 
-    def config(self, plot_width, plot_height, plot_x_min, plot_y_max, max_iteration):
-        self.write(0x20,struct.pack('f', plot_width))
-        self.write(0x28,struct.pack('f', plot_height))
-        self.write(0x30,struct.pack('f', plot_x_min))
-        self.write(0x38,struct.pack('f', plot_y_max))
-        self.write(0x40,max_iteration)
+    def set_width_fraction(self, width_fraction):
+        self.write(0x20,struct.pack('f', width_fraction))
 
-    def set_plot_width(self, plot_width):
-        self.write(0x20,struct.pack('f', plot_width))
-
-    def set_plot_height(self, plot_height):
-        self.write(0x28,struct.pack('f', plot_height))
+    def set_height_fraction(self, height_fraction):
+        self.write(0x28,struct.pack('f', height_fraction))
 
     def set_plot_x_min(self, plot_x_min):
         self.write(0x30,struct.pack('f', plot_x_min))
@@ -38,6 +40,21 @@ class Mandelbrot(DefaultIP):
 
     def set_max_iteration(self, max_iteration):
         self.write(0x40,max_iteration)
+
+    def set_colour_span(self, colour_span):
+        self.write(0x48,colour_span)
+
+    def set_colour_0(self, colour_0):
+        self.write(0x50,colour_0)
+
+    def set_colour_1(self, colour_1):
+        self.write(0x58,colour_1)
+
+    def set_colour_2(self, colour_2):
+        self.write(0x60,colour_2)
+
+    def set_colour_3(self, colour_3):
+        self.write(0x68,colour_3)
 
     def calculate(self):
         # Start IP
