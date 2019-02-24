@@ -32,12 +32,24 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	int_16 max_iter = config.max_iteration;
 	int_16 img_height = config.img_height;
 	int_16 img_width = config.img_width;
-	fixed_32_4_SAT plot_height = config.plot_height;
-	fixed_32_4_SAT plot_width = config.plot_width;
 	fixed_32_4_SAT plot_x_min = config.plot_x_min;
 	fixed_32_4_SAT plot_y_max = config.plot_y_max;
-	fixed_32_4_SAT width_fraction = (fixed_32_4_SAT)1 / img_width;
-	fixed_32_4_SAT height_fraction = (fixed_32_4_SAT)1 / img_height;
+	fixed_32_4_SAT width_fraction = config.width_fraction;
+	fixed_32_4_SAT height_fraction = config.height_fraction;
+
+	uchar colour_span = config.colour_span;
+	uchar colour_0_r = config.colour_0 >> 16;
+	uchar colour_0_g = config.colour_0 >> 8;
+	uchar colour_0_b = config.colour_0;
+	uchar colour_1_r = config.colour_1 >> 16;
+	uchar colour_1_g = config.colour_1 >> 8;
+	uchar colour_1_b = config.colour_1;
+	uchar colour_2_r = config.colour_2 >> 16;
+	uchar colour_2_g = config.colour_2 >> 8;
+	uchar colour_2_b = config.colour_2;
+	uchar colour_3_r = config.colour_3 >> 16;
+	uchar colour_3_g = config.colour_3 >> 8;
+	uchar colour_3_b = config.colour_3;
 
 	for(int_16 img_y = 0; img_y <= img_height; img_y = img_y + PARALLEL_LOOPS) {
 		// '<=' used since one extra loop is needed for img.write at the end
@@ -52,23 +64,35 @@ void calculate(Config& config, RGB_IMAGE& img) {
 
 					if (img_y != 0) {// IMAGE WRITING CODE
 						// nothing to write at beginning of first loop
-						img.write(getPixel(iter[i][j][sub_x], max_iter));
+						img.write(getPixel(
+								iter[i][j][sub_x],
+								max_iter,
+								colour_span,
+								colour_0_r,
+								colour_0_g,
+								colour_0_b,
+								colour_1_r,
+								colour_1_g,
+								colour_1_b,
+								colour_2_r,
+								colour_2_g,
+								colour_2_b,
+								colour_3_r,
+								colour_3_g,
+								colour_3_b
+						));
 					}
 
 					if (img_y != img_height) {// INITIALISATION CODE
 						// nothing to initialise during the extra loop
 
 						int_16 img_x = img_x_offset + sub_x;
-						fixed_32_4_SAT x_0_t1 = img_x * width_fraction;
-						fixed_32_4_SAT x_0_t2 = plot_width * x_0_t1;
-
-						x_0[i][j][sub_x] = x_0_t2 + plot_x_min;
+						fixed_32_4_SAT x_0_t = img_x * width_fraction;
+						x_0[i][j][sub_x] = x_0_t + plot_x_min;
 
 						// use current img_y pixel row number (img_y+i)
-						fixed_32_4_SAT y_0_t1 = (img_y+i) * height_fraction;
-						fixed_32_4_SAT y_0_t2 = plot_height * y_0_t1;
-
-						y_0[i][j][sub_x] = plot_y_max - y_0_t2;
+						fixed_32_4_SAT y_0_t = (img_y+i) * height_fraction;
+						y_0[i][j][sub_x] = plot_y_max - y_0_t;
 
 						x[i][j][sub_x] = 0;
 						y[i][j][sub_x] = 0;
@@ -114,19 +138,67 @@ void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x
 	}
 }
 
-RGB_PIXEL getPixel(int_16& iteration, int_16& max_iteration) {
+RGB_PIXEL getPixel(
+		int_16& iteration,
+		int_16& max_iteration,
+		uchar& colour_span,
+		uchar& colour_0_r,
+		uchar& colour_0_g,
+		uchar& colour_0_b,
+		uchar& colour_1_r,
+		uchar& colour_1_g,
+		uchar& colour_1_b,
+		uchar& colour_2_r,
+		uchar& colour_2_g,
+		uchar& colour_2_b,
+		uchar& colour_3_r,
+		uchar& colour_3_g,
+		uchar& colour_3_b
+) {
 	#pragma HLS INLINE
-	RGB_PIXEL result;
+
+	uchar intensity = 0;
+	uchar colour_a_r = 0;
+	uchar colour_a_g = 0;
+	uchar colour_a_b = 0;
+	uchar colour_b_r = 0;
+	uchar colour_b_g = 0;
+	uchar colour_b_b = 0;
+
 	if (iteration < max_iteration) {
-		int colour = iteration % 512;
-		if (colour > 255) {
-			colour = colour - 256;
-			result = RGB_PIXEL(colour, 255, colour);
-		} else{
-			result = RGB_PIXEL(0, colour, 0);
+		if (colour_span < 8) {
+			iteration = iteration << (8 - colour_span);
+			intensity = iteration;
+		} else {
+			iteration = iteration >> (colour_span - 8);
+			intensity = iteration;
+		}
+		if (iteration < 256) {
+			colour_a_r = colour_0_r;
+			colour_a_g = colour_0_g;
+			colour_a_b = colour_0_b;
+			colour_b_r = colour_1_r;
+			colour_b_g = colour_1_g;
+			colour_b_b = colour_1_b;
+		} else if (iteration < 512){
+			colour_a_r = colour_1_r;
+			colour_a_g = colour_1_g;
+			colour_a_b = colour_1_b;
+			colour_b_r = colour_2_r;
+			colour_b_g = colour_2_g;
+			colour_b_b = colour_2_b;
+		} else {
+			colour_a_r = colour_2_r;
+			colour_a_g = colour_2_g;
+			colour_a_b = colour_2_b;
 		}
 	} else {
-		result = RGB_PIXEL(0,0,0);
+		colour_a_r = colour_3_r;
+		colour_a_g = colour_3_g;
+		colour_a_b = colour_3_b;
 	}
-	return result;
+	uint8_t r = colour_a_r + (((colour_b_r - colour_a_r) * intensity) >> 8);
+	uint8_t g = colour_a_g + (((colour_b_g - colour_a_g) * intensity) >> 8);
+	uint8_t b = colour_a_b + (((colour_b_b - colour_a_b) * intensity) >> 8);
+	return RGB_PIXEL(b, g, r);
 }
