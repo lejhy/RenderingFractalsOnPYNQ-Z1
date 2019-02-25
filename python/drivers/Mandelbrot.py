@@ -30,31 +30,31 @@ class Mandelbrot(DefaultIP):
         self.write(0x20,struct.pack('f', width_fraction))
 
     def set_height_fraction(self, height_fraction):
-        self.write(0x28,struct.pack('f', height_fraction))
+        self.write(0x2c,struct.pack('f', height_fraction))
 
     def set_plot_x_min(self, plot_x_min):
-        self.write(0x30,struct.pack('f', plot_x_min))
+        self.write(0x38,struct.pack('f', plot_x_min))
 
     def set_plot_y_max(self, plot_y_max):
-        self.write(0x38,struct.pack('f', plot_y_max))
+        self.write(0x44,struct.pack('f', plot_y_max))
 
     def set_max_iteration(self, max_iteration):
-        self.write(0x40,max_iteration)
+        self.write(0x50,max_iteration)
 
     def set_colour_span(self, colour_span):
-        self.write(0x48,colour_span)
+        self.write(0x58,colour_span)
 
     def set_colour_0(self, colour_0):
-        self.write(0x50,colour_0)
+        self.write(0x60,colour_0)
 
     def set_colour_1(self, colour_1):
-        self.write(0x58,colour_1)
+        self.write(0x68,colour_1)
 
     def set_colour_2(self, colour_2):
-        self.write(0x60,colour_2)
+        self.write(0x70,colour_2)
 
     def set_colour_3(self, colour_3):
-        self.write(0x68,colour_3)
+        self.write(0x78,colour_3)
 
     def calculate(self):
         # Start IP
