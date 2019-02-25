@@ -6,6 +6,9 @@
 #include <boost/python/numpy.hpp>
 #include <boost/compute.hpp>
 
+typedef unsigned char	uchar;
+typedef unsigned int	uint;
+
 namespace bp = boost::python;
 namespace np = boost::python::numpy;
 namespace cp = boost::compute;
@@ -13,37 +16,34 @@ namespace cp = boost::compute;
 np::ndarray calculate(
 	int img_width, 
 	int img_height, 
-	double plot_width, 
-	double plot_height, 
+	double width_fraction,
+	double height_fraction,
 	double plot_x_min, 
 	double plot_y_max, 
-	unsigned int max_iteration,
-	unsigned int colour_span,
-	unsigned int colour_0,
-	unsigned int colour_1,
-	unsigned int colour_2,
-	unsigned int colour_3
+	uint max_iteration,
+	uint colour_span,
+	uint colour_0,
+	uint colour_1,
+	uint colour_2,
+	uint colour_3
 ) {
 	
 	Py_intptr_t shape[3] = { img_height, img_width, 3 };
 	np::ndarray img = np::empty(3, shape, np::dtype::get_builtin<uint8_t>());
 	char *data = img.get_data();
 
-	double width_fraction = 1.0 / img_width * plot_width;
-	double height_fraction = 1.0 / img_height * plot_height;
-
-	int colour_0_r = (unsigned char)(colour_0 >> 16);
-	int colour_0_g = (unsigned char)(colour_0 >> 8);
-	int colour_0_b = (unsigned char)(colour_0);
-	int colour_1_r = (unsigned char)(colour_1 >> 16);
-	int colour_1_g = (unsigned char)(colour_1 >> 8);
-	int colour_1_b = (unsigned char)(colour_1);
-	int colour_2_r = (unsigned char)(colour_2 >> 16);
-	int colour_2_g = (unsigned char)(colour_2 >> 8);
-	int colour_2_b = (unsigned char)(colour_2);
-	int colour_3_r = (unsigned char)(colour_3 >> 16);
-	int colour_3_g = (unsigned char)(colour_3 >> 8);
-	int colour_3_b = (unsigned char)(colour_3);
+	uchar colour_0_r = colour_0 >> 16;
+	uchar colour_0_g = colour_0 >> 8;
+	uchar colour_0_b = colour_0;
+	uchar colour_1_r = colour_1 >> 16;
+	uchar colour_1_g = colour_1 >> 8;
+	uchar colour_1_b = colour_1;
+	uchar colour_2_r = colour_2 >> 16;
+	uchar colour_2_g = colour_2 >> 8;
+	uchar colour_2_b = colour_2;
+	uchar colour_3_r = colour_3 >> 16;
+	uchar colour_3_g = colour_3 >> 8;
+	uchar colour_3_b = colour_3;
 
 	cp::device device = cp::system::default_device();
 	cp::context context = cp::context(device);
@@ -65,31 +65,31 @@ np::ndarray calculate(
 		"	const double plot_x_min,"
 		"	const double plot_y_max,"
 		"	const int max_iteration,"
-		"	const int colour_span,"
-		"	const int colour_0_r,"
-		"	const int colour_0_g,"
-		"	const int colour_0_b,"
-		"	const int colour_1_r,"
-		"	const int colour_1_g,"
-		"	const int colour_1_b,"
-		"	const int colour_2_r,"
-		"	const int colour_2_g,"
-		"	const int colour_2_b,"
-		"	const int colour_3_r,"
-		"	const int colour_3_g,"
-		"	const int colour_3_b"
+		"	const uchar colour_span,"
+		"	const uchar colour_0_r,"
+		"	const uchar colour_0_g,"
+		"	const uchar colour_0_b,"
+		"	const uchar colour_1_r,"
+		"	const uchar colour_1_g,"
+		"	const uchar colour_1_b,"
+		"	const uchar colour_2_r,"
+		"	const uchar colour_2_g,"
+		"	const uchar colour_2_b,"
+		"	const uchar colour_3_r,"
+		"	const uchar colour_3_g,"
+		"	const uchar colour_3_b"
 		") {"
 		"	const uint id = get_global_id(0);"
 		"	const uint i = id * 3;"
-		"	int img_y = id / img_width;"
-		"	int img_x = id % img_width;"
+		"	uint img_y = id / img_width;"
+		"	uint img_x = id % img_width;"
 		""
 		"	double plot_x = img_x * width_fraction + plot_x_min;"
 		"	double plot_y = plot_y_max - img_y * height_fraction;"
 		""
 		"	double x = 0.0;"
 		"	double y = 0.0;"
-		"	int iteration = 0;"
+		"	uint iteration = 0;"
 		""
 		"	double x_sq = 0;"
 		"	double y_sq = 0;"
@@ -104,27 +104,55 @@ np::ndarray calculate(
 		""
 		"		iteration++;"
 		"	}"
+		"	uchar intensity = 0;"
+		"	uchar colour_a_r = 0;"
+		"	uchar colour_a_g = 0;"
+		"	uchar colour_a_b = 0;"
+		"	uchar colour_b_r = 0;"
+		"	uchar colour_b_g = 0;"
+		"	uchar colour_b_b = 0;"
 		"	if (iteration < max_iteration) {"
-		"		int intensity = iteration % (1 << colour_span);"
-		"		if (iteration < (1 << colour_span)) {"
-		"			data[i]     = colour_0_r + (((colour_1_r - colour_0_r) * intensity) >> colour_span);"
-		"			data[i + 1] = colour_0_g + (((colour_1_g - colour_0_g) * intensity) >> colour_span);"
-		"			data[i + 2] = colour_0_b + (((colour_1_b - colour_0_b) * intensity) >> colour_span);"
-		"		} else if (iteration < (2 << colour_span)){"
-		"			data[i]     = colour_1_r + (((colour_2_r - colour_1_r) * intensity) >> colour_span);"
-		"			data[i + 1] = colour_1_g + (((colour_2_g - colour_1_g) * intensity) >> colour_span);"
-		"			data[i + 2] = colour_1_b + (((colour_2_b - colour_1_b) * intensity) >> colour_span);"
+		"		if (colour_span < 8) {"
+		"			iteration = iteration << (8 - colour_span);"
+		"			intensity = iteration;"
 		"		} else {"
-		"			data[i]     = colour_2_r;"
-		"			data[i + 1] = colour_2_g;"
-		"			data[i + 2] = colour_2_b;"
+		"			iteration = iteration >> (colour_span - 8);"
+		"			intensity = iteration;"
+		"		}"
+		"		if (iteration < 256) {"
+		"			colour_a_r = colour_0_r;"
+		"			colour_a_g = colour_0_g;"
+		"			colour_a_b = colour_0_b;"
+		"			colour_b_r = colour_1_r;"
+		"			colour_b_g = colour_1_g;"
+		"			colour_b_b = colour_1_b;"
+		"		} else if (iteration < 512){"
+		"			colour_a_r = colour_1_r;"
+		"			colour_a_g = colour_1_g;"
+		"			colour_a_b = colour_1_b;"
+		"			colour_b_r = colour_2_r;"
+		"			colour_b_g = colour_2_g;"
+		"			colour_b_b = colour_2_b;"
+		"		} else {"
+		"			colour_a_r = colour_2_r;"
+		"			colour_a_g = colour_2_g;"
+		"			colour_a_b = colour_2_b;"
+		"			colour_b_r = colour_2_r;"
+		"			colour_b_g = colour_2_g;"
+		"			colour_b_b = colour_2_b;"
 		"		}"
 		"	}"
 		"	else {"
-		"		data[i]     = colour_3_r;"
-		"		data[i + 1] = colour_3_g;"
-		"		data[i + 2] = colour_3_b;"
+		"			colour_a_r = colour_3_r;"
+		"			colour_a_g = colour_3_g;"
+		"			colour_a_b = colour_3_b;"
+		"			colour_b_r = colour_3_r;"
+		"			colour_b_g = colour_3_g;"
+		"			colour_b_b = colour_3_b;"
 		"	}"
+		"	data[i]     = colour_a_r + (((colour_b_r - colour_a_r) * intensity) >> 8);"
+		"	data[i + 1] = colour_a_g + (((colour_b_g - colour_a_g) * intensity) >> 8);"
+		"	data[i + 2] = colour_a_b + (((colour_b_b - colour_a_b) * intensity) >> 8);"
 		"}";
 	boost::shared_ptr<cp::program_cache> global_cache = cp::program_cache::get_global_cache(context);
 	std::string options;
@@ -140,7 +168,7 @@ np::ndarray calculate(
 		plot_x_min, 
 		plot_y_max, 
 		max_iteration,
-		colour_span,
+		(uchar)colour_span,
 		colour_0_r,
 		colour_0_g,
 		colour_0_b,
