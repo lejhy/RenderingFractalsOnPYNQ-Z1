@@ -4,10 +4,10 @@
 struct Config {
 	int img_width;
 	int img_height;
-	float width_fraction;
-	float height_fraction;
-	float plot_x_min;
-	float plot_y_max;
+	double width_fraction;
+	double height_fraction;
+	double plot_x_min;
+	double plot_y_max;
 	int max_iteration;
 	int colour_span;
 	int colour_0;

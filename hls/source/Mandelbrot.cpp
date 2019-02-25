@@ -191,14 +191,20 @@ RGB_PIXEL getPixel(
 			colour_a_r = colour_2_r;
 			colour_a_g = colour_2_g;
 			colour_a_b = colour_2_b;
+			colour_b_r = colour_2_r;
+			colour_b_g = colour_2_g;
+			colour_b_b = colour_2_b;
 		}
 	} else {
 		colour_a_r = colour_3_r;
 		colour_a_g = colour_3_g;
 		colour_a_b = colour_3_b;
+		colour_b_r = colour_3_r;
+		colour_b_g = colour_3_g;
+		colour_b_b = colour_3_b;
 	}
 	uint8_t r = colour_a_r + (((colour_b_r - colour_a_r) * intensity) >> 8);
 	uint8_t g = colour_a_g + (((colour_b_g - colour_a_g) * intensity) >> 8);
 	uint8_t b = colour_a_b + (((colour_b_b - colour_a_b) * intensity) >> 8);
-	return RGB_PIXEL(b, g, r);
+	return RGB_PIXEL(r, g, b);
 }

@@ -17,7 +17,7 @@ typedef hls::stream<ap_axiu<32,1,1,1> >     AXI_STREAM;
 typedef hls::Scalar<3, uchar>       RGB_PIXEL;
 typedef hls::Mat<HEIGHT, WIDTH, HLS_8UC3>   RGB_IMAGE;
 
-typedef ap_fixed<32, 4, AP_TRN_ZERO, AP_SAT> fixed_32_4_SAT;
+typedef ap_fixed<32, 4, AP_RND, AP_SAT> fixed_32_4_SAT;
 typedef uint16_t int_16;
 
 void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config);
