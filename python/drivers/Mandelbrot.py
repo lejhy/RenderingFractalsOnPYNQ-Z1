@@ -27,16 +27,16 @@ class Mandelbrot(DefaultIP):
     bindto = ['xilinx.com:hls:mandelbrot:1.0']
 
     def set_width_fraction(self, width_fraction):
-        self.write(0x20,struct.pack('f', width_fraction))
+        self.write(0x20,struct.pack('d', width_fraction))
 
     def set_height_fraction(self, height_fraction):
-        self.write(0x2c,struct.pack('f', height_fraction))
+        self.write(0x2c,struct.pack('d', height_fraction))
 
     def set_plot_x_min(self, plot_x_min):
-        self.write(0x38,struct.pack('f', plot_x_min))
+        self.write(0x38,struct.pack('d', plot_x_min))
 
     def set_plot_y_max(self, plot_y_max):
-        self.write(0x44,struct.pack('f', plot_y_max))
+        self.write(0x44,struct.pack('d', plot_y_max))
 
     def set_max_iteration(self, max_iteration):
         self.write(0x50,max_iteration)
