@@ -16,31 +16,24 @@ class PyQtView:
         self.h_box.setAlignment(Qt.AlignTop)
         self.iteration = QSpinBox(self.label)
         self.iteration.setMinimum(1)
-        self.iteration.setMaximum(100000)
+        self.iteration.setMaximum(65535)
         self.iteration.setMinimumWidth(50)
+        self.colour_offset = QSpinBox(self.label)
+        self.colour_offset.setMinimum(0)
+        self.colour_offset.setMaximum(65535)
+        self.colour_offset.setMinimumWidth(50)
         self.colour_span = QSpinBox(self.label)
         self.colour_span.setMinimum(1)
         self.colour_span.setMaximum(24)
         self.colour_span.setMinimumWidth(50)
-        self.colour_0 = QPushButton("colour_0", self.label)
-        self.colour_0.setFlat(True)
-        self.colour_0.setAutoFillBackground(True)
-        self.colour_1 = QPushButton("colour_1", self.label)
-        self.colour_1.setFlat(True)
-        self.colour_1.setAutoFillBackground(True)
-        self.colour_2 = QPushButton("colour_2", self.label)
-        self.colour_2.setFlat(True)
-        self.colour_2.setAutoFillBackground(True)
-        self.colour_3 = QPushButton("colour_3", self.label)
-        self.colour_3.setFlat(True)
-        self.colour_3.setAutoFillBackground(True)
+        self.colours = []
+        self.save = QPushButton("save", self.label)
         self.window.setCentralWidget(self.label)
         self.h_box.addWidget(self.iteration)
+        self.h_box.addWidget(self.colour_offset)
         self.h_box.addWidget(self.colour_span)
-        self.h_box.addWidget(self.colour_0)
-        self.h_box.addWidget(self.colour_1)
-        self.h_box.addWidget(self.colour_2)
-        self.h_box.addWidget(self.colour_3)
+        self.h_box.addWidget(self.save)
+        self.window.resize(1920, 1080)
         self.window.show()
 
     def render(self, img):
@@ -61,8 +54,17 @@ class PyQtView:
     def stop_selection(self):
         self.selection.hide()
 
-    def colour_button(self, button, colour_value):
-        bg_colour = QColor(colour_value)
+    def create_colour_buttons(self, number, colours):
+        for n in range(number):
+            button = QPushButton("colour %i" % n, self.label)
+            self.colours.append(button)
+            button.setFlat(True)
+            button.setAutoFillBackground(True)
+            self.h_box.addWidget(button)
+            self.set_button_colour(button, colours[n])
+
+    def set_button_colour(self, button, colour):
+        bg_colour = QColor(colour)
         if bg_colour.lightnessF() < 0.5:
             text_colour = QColor(0xF0F0F0)
         else:
@@ -73,6 +75,11 @@ class PyQtView:
         button.setPalette(palette)
 
     def get_color(self, initial_value):
-        return QColorDialog.getColor(QColor(initial_value)).rgba()
+        Qcolour = QColorDialog.getColor(QColor(initial_value))
+        if Qcolour.isValid():
+            colour = Qcolour.rgba()
+        else:
+            colour = initial_value
+        return colour
 
 

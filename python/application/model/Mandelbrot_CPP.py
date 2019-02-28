@@ -1,4 +1,5 @@
 import Mandelbrot
+import numpy as np
 
 
 class Mandelbrot_CPP:
@@ -10,11 +11,9 @@ class Mandelbrot_CPP:
         self._plot_x_min = -2.5
         self._plot_y_max = 1.0
         self._max_iteration = 1000
+        self._colour_offset = 0
         self._colour_span = 8
-        self._colour_0 = 0x00ffb444
-        self._colour_1 = 0x007e00af
-        self._colour_2 = 0x00200042
-        self._colour_3 = 0x00FFFFFF
+        self._colours = np.array([0x00ffb444, 0x007e00af, 0x00200042, 0x00FFFFFF, 0x00FFFFFF], np.uint32)
         self._shell = False
 
     @property
@@ -31,11 +30,10 @@ class Mandelbrot_CPP:
         self.max_iteration = self._max_iteration
         self.width_fraction = self._width_fraction
         self.height_fraction = self._height_fraction
+        self.colour_offset = self._colour_offset
         self.colour_span = self._colour_span
-        self.colour_0 = self._colour_0
-        self.colour_1 = self._colour_1
-        self.colour_2 = self._colour_2
-        self.colour_3 = self._colour_3
+        for n, colour in enumerate(self._colours):
+            self.set_colour(n, colour)
 
     @property
     def img_width(self):
@@ -120,6 +118,16 @@ class Mandelbrot_CPP:
             self._shell.send("mandelbrot.set_max_iteration(%i)\n" % self._max_iteration)
 
     @property
+    def colour_offset(self):
+        return self._colour_offset
+
+    @colour_offset.setter
+    def colour_offset(self, value):
+        self._colour_offset = value
+        if self._shell:
+            self._shell.send("mandelbrot.set_colour_offset(%i)\n" % self._colour_offset)
+
+    @property
     def colour_span(self):
         return self._colour_span
 
@@ -130,44 +138,16 @@ class Mandelbrot_CPP:
             self._shell.send("mandelbrot.set_colour_span(%i)\n" % self._colour_span)
 
     @property
-    def colour_0(self):
-        return self._colour_0
+    def colours(self):
+        return tuple(self._colours)
 
-    @colour_0.setter
-    def colour_0(self, value):
-        self._colour_0 = value
+    def get_colour(self, n):
+        return self._colours[n]
+
+    def set_colour(self, n, value):
+        self._colours[n] = value
         if self._shell:
-            self._shell.send("mandelbrot.set_colour_0(%i)\n" % self._colour_0)
-
-    @property
-    def colour_1(self):
-        return self._colour_1
-
-    @colour_1.setter
-    def colour_1(self, value):
-        self._colour_1 = value
-        if self._shell:
-            self._shell.send("mandelbrot.set_colour_1(%i)\n" % self._colour_1)
-
-    @property
-    def colour_2(self):
-        return self._colour_2
-
-    @colour_2.setter
-    def colour_2(self, value):
-        self._colour_2 = value
-        if self._shell:
-            self._shell.send("mandelbrot.set_colour_2(%i)\n" % self._colour_2)
-
-    @property
-    def colour_3(self):
-        return self._colour_3
-
-    @colour_3.setter
-    def colour_3(self, value):
-        self._colour_3 = value
-        if self._shell:
-            self._shell.send("mandelbrot.set_colour_3(%i)\n" % self._colour_3)
+            self._shell.send("mandelbrot.set_colour_%i(%i)\n" % (n, self._colours[n]))
 
     def calculate(self):
         if self.shell:
@@ -180,11 +160,9 @@ class Mandelbrot_CPP:
             self._plot_x_min,
             self._plot_y_max,
             self._max_iteration,
+            self._colour_offset,
             self._colour_span,
-            self._colour_0,
-            self._colour_1,
-            self._colour_2,
-            self._colour_3
+            self._colours
         )
 
 

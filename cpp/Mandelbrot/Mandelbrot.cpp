@@ -21,29 +21,25 @@ np::ndarray calculate(
 	double plot_x_min, 
 	double plot_y_max, 
 	uint max_iteration,
+	uint colour_offset,
 	uint colour_span,
-	uint colour_0,
-	uint colour_1,
-	uint colour_2,
-	uint colour_3
+	np::ndarray colours
 ) {
 	
 	Py_intptr_t shape[3] = { img_height, img_width, 3 };
 	np::ndarray img = np::empty(3, shape, np::dtype::get_builtin<uint8_t>());
 	char *data = img.get_data();
 
-	uchar colour_0_r = colour_0 >> 16;
-	uchar colour_0_g = colour_0 >> 8;
-	uchar colour_0_b = colour_0;
-	uchar colour_1_r = colour_1 >> 16;
-	uchar colour_1_g = colour_1 >> 8;
-	uchar colour_1_b = colour_1;
-	uchar colour_2_r = colour_2 >> 16;
-	uchar colour_2_g = colour_2 >> 8;
-	uchar colour_2_b = colour_2;
-	uchar colour_3_r = colour_3 >> 16;
-	uchar colour_3_g = colour_3 >> 8;
-	uchar colour_3_b = colour_3;
+	const int number_of_colours = 5;
+	if (colours.shape(0) != number_of_colours) throw std::invalid_argument("Invalid number of colours, should be " + number_of_colours);
+	uint* colours_data = reinterpret_cast<uint*>(colours.get_data());
+	char colour_channels[number_of_colours * 3] = { 0 };
+	for (int n = 0; n < number_of_colours; n++) {
+		int colour = colours_data[n];
+		colour_channels[n * 3 + 0] = colour >> 16;
+		colour_channels[n * 3 + 1] = colour >> 8;
+		colour_channels[n * 3 + 2] = colour;
+	}
 
 	cp::device device = cp::system::default_device();
 	cp::context context = cp::context(device);
@@ -65,6 +61,7 @@ np::ndarray calculate(
 		"	const double plot_x_min,"
 		"	const double plot_y_max,"
 		"	const int max_iteration,"
+		"	const int colour_offset,"
 		"	const uchar colour_span,"
 		"	const uchar colour_0_r,"
 		"	const uchar colour_0_g,"
@@ -77,7 +74,10 @@ np::ndarray calculate(
 		"	const uchar colour_2_b,"
 		"	const uchar colour_3_r,"
 		"	const uchar colour_3_g,"
-		"	const uchar colour_3_b"
+		"	const uchar colour_3_b,"
+		"	const uchar colour_4_r,"
+		"	const uchar colour_4_g,"
+		"	const uchar colour_4_b"
 		") {"
 		"	const uint id = get_global_id(0);"
 		"	const uint i = id * 3;"
@@ -112,13 +112,9 @@ np::ndarray calculate(
 		"	uchar colour_b_g = 0;"
 		"	uchar colour_b_b = 0;"
 		"	if (iteration < max_iteration) {"
-		"		if (colour_span < 8) {"
-		"			iteration = iteration << (8 - colour_span);"
-		"			intensity = iteration;"
-		"		} else {"
-		"			iteration = iteration >> (colour_span - 8);"
-		"			intensity = iteration;"
-		"		}"
+		"		iteration = iteration < colour_offset ? 0 : iteration - colour_offset;"
+		"		iteration = colour_span < 8 ? iteration << (8 - colour_span) : iteration >> (colour_span - 8);"
+		"		intensity = iteration;"
 		"		if (iteration < 256) {"
 		"			colour_a_r = colour_0_r;"
 		"			colour_a_g = colour_0_g;"
@@ -133,22 +129,29 @@ np::ndarray calculate(
 		"			colour_b_r = colour_2_r;"
 		"			colour_b_g = colour_2_g;"
 		"			colour_b_b = colour_2_b;"
-		"		} else {"
+		"		} else if (iteration < 768){"
 		"			colour_a_r = colour_2_r;"
 		"			colour_a_g = colour_2_g;"
 		"			colour_a_b = colour_2_b;"
-		"			colour_b_r = colour_2_r;"
-		"			colour_b_g = colour_2_g;"
-		"			colour_b_b = colour_2_b;"
-		"		}"
-		"	}"
-		"	else {"
+		"			colour_b_r = colour_3_r;"
+		"			colour_b_g = colour_3_g;"
+		"			colour_b_b = colour_3_b;"
+		"		} else {"
 		"			colour_a_r = colour_3_r;"
 		"			colour_a_g = colour_3_g;"
 		"			colour_a_b = colour_3_b;"
 		"			colour_b_r = colour_3_r;"
 		"			colour_b_g = colour_3_g;"
 		"			colour_b_b = colour_3_b;"
+		"		}"
+		"	}"
+		"	else {"
+		"			colour_a_r = colour_4_r;"
+		"			colour_a_g = colour_4_g;"
+		"			colour_a_b = colour_4_b;"
+		"			colour_b_r = colour_4_r;"
+		"			colour_b_g = colour_4_g;"
+		"			colour_b_b = colour_4_b;"
 		"	}"
 		"	data[i]     = colour_a_r + (((colour_b_r - colour_a_r) * intensity) >> 8);"
 		"	data[i + 1] = colour_a_g + (((colour_b_g - colour_a_g) * intensity) >> 8);"
@@ -168,19 +171,23 @@ np::ndarray calculate(
 		plot_x_min, 
 		plot_y_max, 
 		max_iteration,
+		colour_offset,
 		(uchar)colour_span,
-		colour_0_r,
-		colour_0_g,
-		colour_0_b,
-		colour_1_r,
-		colour_1_g,
-		colour_1_b,
-		colour_2_r,
-		colour_2_g,
-		colour_2_b,
-		colour_3_r,
-		colour_3_g,
-		colour_3_b
+		colour_channels[0],
+		colour_channels[1],
+		colour_channels[2],
+		colour_channels[3],
+		colour_channels[4],
+		colour_channels[5],
+		colour_channels[6],
+		colour_channels[7],
+		colour_channels[8],
+		colour_channels[9],
+		colour_channels[10],
+		colour_channels[11],
+		colour_channels[12],
+		colour_channels[13],
+		colour_channels[14]
 	);
 
 	queue.enqueue_1d_range_kernel(kernel, 0, num_of_pixels, 0);
