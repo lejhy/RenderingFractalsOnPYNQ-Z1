@@ -2,18 +2,20 @@
 #define _CONFIG_H_
 
 struct Config {
-	int img_width;
-	int img_height;
+	unsigned int img_width;
+	unsigned int img_height;
 	double width_fraction;
 	double height_fraction;
 	double plot_x_min;
 	double plot_y_max;
-	int max_iteration;
-	int colour_span;
-	int colour_0;
-	int colour_1;
-	int colour_2;
-	int colour_3;
+	unsigned int max_iteration;
+	unsigned int colour_offset;
+	unsigned int colour_span;
+	unsigned int colour_0;
+	unsigned int colour_1;
+	unsigned int colour_2;
+	unsigned int colour_3;
+	unsigned int colour_4;
 };
 
 #endif

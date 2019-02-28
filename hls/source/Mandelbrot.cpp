@@ -25,18 +25,19 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	fixed_32_4_SAT y[PARALLEL_LOOPS][PARALLEL_SUB_LOOPS][SUB_LOOP_WIDTH];
 	#pragma HLS array_partition variable=y complete dim=2
 	#pragma HLS array_partition variable=y complete dim=1
-	int_16 iter[PARALLEL_LOOPS][PARALLEL_SUB_LOOPS][SUB_LOOP_WIDTH];
+	uint16_t iter[PARALLEL_LOOPS][PARALLEL_SUB_LOOPS][SUB_LOOP_WIDTH];
 	#pragma HLS array_partition variable=iter complete dim=2
 	#pragma HLS array_partition variable=iter complete dim=1
 
-	int_16 max_iter = config.max_iteration;
-	int_16 img_height = config.img_height;
-	int_16 img_width = config.img_width;
+	uint16_t max_iter = config.max_iteration;
+	uint16_t img_height = config.img_height;
+	uint16_t img_width = config.img_width;
 	fixed_32_4_SAT plot_x_min = config.plot_x_min;
 	fixed_32_4_SAT plot_y_max = config.plot_y_max;
 	fixed_32_4_SAT width_fraction = config.width_fraction;
 	fixed_32_4_SAT height_fraction = config.height_fraction;
 
+	uint16_t colour_offset = config.colour_offset;
 	uchar colour_span = config.colour_span;
 	uchar colour_0_r = config.colour_0 >> 16;
 	uchar colour_0_g = config.colour_0 >> 8;
@@ -50,15 +51,18 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	uchar colour_3_r = config.colour_3 >> 16;
 	uchar colour_3_g = config.colour_3 >> 8;
 	uchar colour_3_b = config.colour_3;
+	uchar colour_4_r = config.colour_4 >> 16;
+	uchar colour_4_g = config.colour_4 >> 8;
+	uchar colour_4_b = config.colour_4;
 
-	for(int_16 img_y = 0; img_y <= img_height; img_y = img_y + PARALLEL_LOOPS) {
+	for(uint16_t img_y = 0; img_y <= img_height; img_y = img_y + PARALLEL_LOOPS) {
 		// '<=' used since one extra loop is needed for img.write at the end
 
-		for(int_16 i = 0; i < PARALLEL_LOOPS; i++){// MAINTENANCE LOOP
-			int_16 img_x_offset = 0;
+		for(uint16_t i = 0; i < PARALLEL_LOOPS; i++){// MAINTENANCE LOOP
+			uint16_t img_x_offset = 0;
 
-			for(int_16 j = 0; j < PARALLEL_SUB_LOOPS; j++){
-				for(int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++){
+			for(uint16_t j = 0; j < PARALLEL_SUB_LOOPS; j++){
+				for(uint16_t sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++){
 					#pragma HLS LOOP_FLATTEN
 					#pragma HLS PIPELINE
 
@@ -67,6 +71,7 @@ void calculate(Config& config, RGB_IMAGE& img) {
 						img.write(getPixel(
 								iter[i][j][sub_x],
 								max_iter,
+								colour_offset,
 								colour_span,
 								colour_0_r,
 								colour_0_g,
@@ -79,14 +84,17 @@ void calculate(Config& config, RGB_IMAGE& img) {
 								colour_2_b,
 								colour_3_r,
 								colour_3_g,
-								colour_3_b
+								colour_3_b,
+								colour_4_r,
+								colour_4_g,
+								colour_4_b
 						));
 					}
 
 					if (img_y != img_height) {// INITIALISATION CODE
 						// nothing to initialise during the extra loop
 
-						int_16 img_x = img_x_offset + sub_x;
+						uint16_t img_x = img_x_offset + sub_x;
 						fixed_32_4_SAT x_0_t = img_x * width_fraction;
 						x_0[i][j][sub_x] = x_0_t + plot_x_min;
 
@@ -107,9 +115,9 @@ void calculate(Config& config, RGB_IMAGE& img) {
 		if (img_y != img_height) {
 			// nothing to process during the extra loop
 
-			for(int_16 i = 0; i < PARALLEL_LOOPS; i++) {// PROCESSING LOOP
+			for(uint16_t i = 0; i < PARALLEL_LOOPS; i++) {// PROCESSING LOOP
 				#pragma HLS UNROLL
-				for (int_16 j = 0; j < PARALLEL_SUB_LOOPS; j++) {
+				for (uint16_t j = 0; j < PARALLEL_SUB_LOOPS; j++) {
 					#pragma HLS UNROLL
 					subLineProcess(x_0[i][j], y_0[i][j], x[i][j], y[i][j], iter[i][j], max_iter);
 				}
@@ -119,9 +127,9 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	}
 }
 
-void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x[], fixed_32_4_SAT y[], int_16 iter[], int_16 max_iter){
+void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x[], fixed_32_4_SAT y[], uint16_t iter[], uint16_t max_iter){
 	for (int j = 0; j < max_iter; j++) {
-		for (int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++) {
+		for (uint16_t sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++) {
 			#pragma HLS PIPELINE
 			fixed_32_4_SAT x_sq = x[sub_x]*x[sub_x];
 			fixed_32_4_SAT y_sq = y[sub_x]*y[sub_x];
@@ -139,8 +147,9 @@ void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x
 }
 
 RGB_PIXEL getPixel(
-		int_16& iteration,
-		int_16& max_iteration,
+		uint16_t& iteration,
+		uint16_t& max_iteration,
+		uint16_t& colour_offset,
 		uchar& colour_span,
 		uchar& colour_0_r,
 		uchar& colour_0_g,
@@ -153,7 +162,10 @@ RGB_PIXEL getPixel(
 		uchar& colour_2_b,
 		uchar& colour_3_r,
 		uchar& colour_3_g,
-		uchar& colour_3_b
+		uchar& colour_3_b,
+		uchar& colour_4_r,
+		uchar& colour_4_g,
+		uchar& colour_4_b
 ) {
 	#pragma HLS INLINE
 
@@ -166,13 +178,9 @@ RGB_PIXEL getPixel(
 	uchar colour_b_b = 0;
 
 	if (iteration < max_iteration) {
-		if (colour_span < 8) {
-			iteration = iteration << (8 - colour_span);
-			intensity = iteration;
-		} else {
-			iteration = iteration >> (colour_span - 8);
-			intensity = iteration;
-		}
+		iteration = iteration < colour_offset ? 0 : iteration - colour_offset;
+		iteration = colour_span < 8 ? iteration << (8 - colour_span) : iteration >> (colour_span - 8);
+		intensity = iteration;
 		if (iteration < 256) {
 			colour_a_r = colour_0_r;
 			colour_a_g = colour_0_g;
@@ -187,21 +195,28 @@ RGB_PIXEL getPixel(
 			colour_b_r = colour_2_r;
 			colour_b_g = colour_2_g;
 			colour_b_b = colour_2_b;
-		} else {
+		} else if (iteration < 768){
 			colour_a_r = colour_2_r;
 			colour_a_g = colour_2_g;
 			colour_a_b = colour_2_b;
-			colour_b_r = colour_2_r;
-			colour_b_g = colour_2_g;
-			colour_b_b = colour_2_b;
+			colour_b_r = colour_3_r;
+			colour_b_g = colour_3_g;
+			colour_b_b = colour_3_b;
+		} else {
+			colour_a_r = colour_3_r;
+			colour_a_g = colour_3_g;
+			colour_a_b = colour_3_b;
+			colour_b_r = colour_3_r;
+			colour_b_g = colour_3_g;
+			colour_b_b = colour_3_b;
 		}
 	} else {
-		colour_a_r = colour_3_r;
-		colour_a_g = colour_3_g;
-		colour_a_b = colour_3_b;
-		colour_b_r = colour_3_r;
-		colour_b_g = colour_3_g;
-		colour_b_b = colour_3_b;
+		colour_a_r = colour_4_r;
+		colour_a_g = colour_4_g;
+		colour_a_b = colour_4_b;
+		colour_b_r = colour_4_r;
+		colour_b_g = colour_4_g;
+		colour_b_b = colour_4_b;
 	}
 	uint8_t r = colour_a_r + (((colour_b_r - colour_a_r) * intensity) >> 8);
 	uint8_t g = colour_a_g + (((colour_b_g - colour_a_g) * intensity) >> 8);
