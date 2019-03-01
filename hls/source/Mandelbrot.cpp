@@ -119,7 +119,14 @@ void calculate(Config& config, RGB_IMAGE& img) {
                 #pragma HLS UNROLL
                 for (uint16_t j = 0; j < PARALLEL_SUB_LOOPS; j++) {
                     #pragma HLS UNROLL
-                    subLineProcess(x_0[i][j], y_0[i][j], x[i][j], y[i][j], iter[i][j], max_iter);
+                    subLineProcess(
+                        x_0[i][j],
+                        y_0[i][j],
+                        x[i][j],
+                        y[i][j],
+                        iter[i][j],
+                        max_iter
+                    );
                 }
             }
         }
@@ -127,7 +134,14 @@ void calculate(Config& config, RGB_IMAGE& img) {
     }
 }
 
-void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x[], fixed_32_4_SAT y[], uint16_t iter[], uint16_t max_iter){
+void subLineProcess(
+    fixed_32_4_SAT x_0[],
+    fixed_32_4_SAT y_0[],
+    fixed_32_4_SAT x[],
+    fixed_32_4_SAT y[],
+    uint16_t iter[],
+    uint16_t max_iter
+){
     for (int j = 0; j < max_iter; j++) {
         for (uint16_t sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++) {
             #pragma HLS PIPELINE
@@ -179,8 +193,13 @@ RGB_PIXEL getPixel(
 
     if (iteration < max_iteration) {
         iteration = iteration < colour_offset ? 0 : iteration - colour_offset;
-        iteration = colour_span < 8 ? iteration << (8 - colour_span) : iteration >> (colour_span - 8);
+        if (colour_span < 8) {
+            iteration = iteration << (8 - colour_span);
+        } else {
+            iteration = iteration >> (colour_span - 8);
+        }
         intensity = iteration;
+        
         if (iteration < 256) {
             colour_a_r = colour_0_r;
             colour_a_g = colour_0_g;
