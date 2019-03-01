@@ -17,7 +17,7 @@ class Mandelbrot(DefaultIP):
         self.set_height_fraction(2.0/1080)
         self.set_plot_x_min(-2.5)
         self.set_plot_y_max(1.0)
-        self.set_max_iteration(512)
+        self.set_max_iteration(1000)
         self.set_colour_offset(0)
         self.set_colour_span(8)
         self.set_colour_0(0xFFFFFF)
