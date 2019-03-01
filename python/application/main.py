@@ -8,7 +8,7 @@ model = Mandelbrot_CPP()
 view = PyQtView(1920, 1080)
 controller = Controller(model, view)
 
-start: float = time.time()
+start = time.time()
 controller.update()
 end = time.time()
 print("Render took:", end - start, "s")
