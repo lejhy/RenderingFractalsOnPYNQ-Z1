@@ -38,7 +38,11 @@ class Controller:
             hostname = hostname_input or default_hostname
             username = username_input or default_username
             password = getpass.getpass("Password: ", stream=None)
-            self.ssh.connect(hostname=hostname, username=username, password=password)
+            self.ssh.connect(
+                hostname=hostname,
+                username=username,
+                password=password
+            )
             self.shell = self.ssh.invoke_shell()
             recv = self.shell.recv(1024)
             self.shell.send("su\n")
