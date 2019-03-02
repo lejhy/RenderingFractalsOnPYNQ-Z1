@@ -13,7 +13,10 @@ class Mandelbrot_CPP:
         self._max_iteration = 1000
         self._colour_offset = 0
         self._colour_span = 8
-        self._colours = np.array([0x00ffb444, 0x007e00af, 0x00200042, 0x00FFFFFF, 0x00FFFFFF], np.uint32)
+        self._colours = np.array(
+            [0x00ffb444, 0x007e00af, 0x00200042, 0x00FFFFFF, 0x00FFFFFF],
+            np.uint32
+        )
         self._shell = False
 
     @property

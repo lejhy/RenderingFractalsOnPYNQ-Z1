@@ -1,4 +1,13 @@
-from PyQt5.QtWidgets import QApplication, QLabel, QSpinBox, QMainWindow, QRubberBand, QHBoxLayout, QColorDialog, QPushButton
+from PyQt5.QtWidgets import (
+    QApplication,
+    QLabel,
+    QSpinBox,
+    QMainWindow,
+    QRubberBand,
+    QHBoxLayout,
+    QColorDialog,
+    QPushButton
+)
 from PyQt5.QtGui import QImage, QPixmap, QColor, QPalette
 from PyQt5.QtCore import Qt
 

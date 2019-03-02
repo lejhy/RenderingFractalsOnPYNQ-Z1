@@ -33,8 +33,10 @@ class Controller:
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             default_hostname = "lejhanec.ddns.net"
             default_username = "xilinx"
-            hostname = (input("Hostname ({0}): ".format(default_hostname)) or default_hostname)
-            username = (input("Username ({0}): ".format(default_username)) or default_username)
+            hostname_input = input("Hostname ({0}): ".format(default_hostname))
+            username_input = input("Username ({0}): ".format(default_username))
+            hostname = hostname_input or default_hostname
+            username = username_input or default_username
             password = getpass.getpass("Password: ", stream=None)
             self.ssh.connect(hostname=hostname, username=username, password=password)
             self.shell = self.ssh.invoke_shell()
@@ -82,10 +84,10 @@ class Controller:
         self.view.render(result)
 
     def updateSelection(self):
-        self.model.plot_x_min += min(self.start['x'], self.end['x']) * self.model.plot_width
-        self.model.plot_y_max -= min(self.start['y'], self.end['y']) * self.model.plot_height
-        self.model.plot_width = abs(self.end['x'] - self.start['x']) * self.model.plot_width
-        self.model.plot_height = abs(self.end['y'] - self.start['y']) * self.model.plot_height
+        self.model.plot_x_min += self.start['x'] * self.model.plot_width
+        self.model.plot_y_max -= self.start['y'] * self.model.plot_height
+        self.model.plot_width *= self.end['x'] - self.start['x']
+        self.model.plot_height *= self.end['y'] - self.start['y']
         self.update()
 
     def updateZoomIn(self, x, y):
@@ -123,6 +125,9 @@ class Controller:
             self.view.stop_selection()
 
     def handleMouseMoveEvent(self, event):
+        coords = self.getCoords(event)
+        self.start['x'] = min(self.start['x'], coords['x'])
+        self.start['y'] = min(self.start['y'], coords['y'])
         self.view.move_selection(event.localPos().x(), event.localPos().y())
 
     def handleIterationChange(self, value):
