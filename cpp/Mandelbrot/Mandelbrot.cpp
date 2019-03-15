@@ -47,8 +47,8 @@ const char source[] = BOOST_COMPUTE_STRINGIZE_SOURCE(
         uint img_y = id / img_width;
         uint img_x = id % img_width;
 
-        double plot_x = plot_x_min + plot_width * (img_x / img_width);
-        double plot_y = plot_y_max - plot_height * (img_y / img_height);
+        double plot_x = plot_x_min + plot_width * ((double)img_x / img_width);
+        double plot_y = plot_y_max - plot_height * ((double)img_y / img_height);
 
         double x = 0.0;
         double y = 0.0;
