@@ -23,7 +23,11 @@ int main () {
 
 	std::cout << "Render took: " << end-start << " s";
 
-	IplImage* img = cvCreateImage(cvSize(config.img_width, config.img_height), 8, 3);
+	IplImage* img = cvCreateImage(
+		cvSize(config.img_width, config.img_height),
+		8,
+		3
+	);
 	AXIvideo2IplImage(img_axi, img);
 
 	cvSaveImage("img.bmp", img);

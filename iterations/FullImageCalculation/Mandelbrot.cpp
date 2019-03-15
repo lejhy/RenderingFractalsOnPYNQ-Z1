@@ -16,11 +16,16 @@ void mandelbrot(AXI_STREAM& OUTPUT_STREAM, Config& config) {
 }
 
 void calculate(Config& config, RGB_IMAGE& img) {
-	// Image coordinates have origin at top left, plot coordinates have origin at bottom left
+	// Image coordinates have origin at top left
+	// Plot coordinates have origin at bottom left
 	for(int img_y = 0; img_y < config.img_height; img_y++) {
 		for(int img_x = 0; img_x < config.img_width; img_x++) {
-			double plot_x = (double)img_x / (double)config.img_width * config.plot_width + config.plot_x_min;
-			double plot_y = config.plot_y_max - (double)img_y / (double)config.img_height * config.plot_height;
+			double plot_x = config.plot_x_min
+				+ (double)img_x / (double)config.img_width * config.plot_width
+			;
+			double plot_y = config.plot_y_max
+				- (double)img_y / (double)config.img_height * config.plot_height
+			;
 			double x = 0.0;
 			double y = 0.0;
 			int iteration = 0;

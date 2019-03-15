@@ -32,10 +32,12 @@ void calculate(Config& config, RGB_IMAGE& img) {
     uint16_t max_iter = config.max_iteration;
     uint16_t img_height = config.img_height;
     uint16_t img_width = config.img_width;
+    fixed_32_4_SAT plot_height = config.plot_height;
+    fixed_32_4_SAT plot_width = config.plot_width;
     fixed_32_4_SAT plot_x_min = config.plot_x_min;
     fixed_32_4_SAT plot_y_max = config.plot_y_max;
-    fixed_32_4_SAT width_fraction = config.width_fraction;
-    fixed_32_4_SAT height_fraction = config.height_fraction;
+    fixed_32_4_SAT width_fraction = (fixed_32_4_SAT)1 / img_width;
+    fixed_32_4_SAT height_fraction = (fixed_32_4_SAT)1 / img_height;
 
     uint16_t colour_offset = config.colour_offset;
     uchar colour_span = config.colour_span;
@@ -95,19 +97,20 @@ void calculate(Config& config, RGB_IMAGE& img) {
                         // nothing to initialise during the extra loop
 
                         uint16_t img_x = img_x_offset + sub_x;
-                        fixed_32_4_SAT x_0_t = img_x * width_fraction;
-                        x_0[i][j][sub_x] = x_0_t + plot_x_min;
+                        fixed_32_4_SAT x_0_t1 = img_x * width_fraction;
+                        fixed_32_4_SAT x_0_t2 = plot_width * x_0_t1;
+                        x_0[i][j][sub_x] = x_0_t2 + plot_x_min;
 
                         // use current img_y pixel row number (img_y+i)
-                        fixed_32_4_SAT y_0_t = (img_y+i) * height_fraction;
-                        y_0[i][j][sub_x] = plot_y_max - y_0_t;
+                        fixed_32_4_SAT y_0_t1 = (img_y+i) * height_fraction;
+                        fixed_32_4_SAT y_0_t2 = plot_height * y_0_t1;
+                        y_0[i][j][sub_x] = plot_y_max - y_0_t2;
 
                         x[i][j][sub_x] = 0;
                         y[i][j][sub_x] = 0;
                         iter[i][j][sub_x] = 0;
                     }
                 }
-
                 img_x_offset += SUB_LOOP_WIDTH;
             }
         }

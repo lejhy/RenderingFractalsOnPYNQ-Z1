@@ -4,7 +4,6 @@
 #include "Config.h"
 #include "hls_video.h"
 #include "ap_fixed.h"
-#include "ap_int.h"
 
 #define PARALLEL_LOOPS      8
 #define PARALLEL_SUB_LOOPS  2

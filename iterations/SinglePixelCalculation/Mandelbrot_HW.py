@@ -32,7 +32,11 @@ class Mandelbrot:
                 # Wait for interrupt
                 loop = asyncio.get_event_loop()
                 while(self.ip.read(0x0c) & 0x1 == 0):
-                    loop.run_until_complete(asyncio.ensure_future(self.ip.interrupt.wait()))
+                    loop.run_until_complete(
+                        asyncio.ensure_future(
+                            self.ip.interrupt.wait()
+                        )
+                    )
                 # Clear interrupt
                 self.ip.write(0x0c, 0x1)
                 self.ip.interrupt.event.clear()

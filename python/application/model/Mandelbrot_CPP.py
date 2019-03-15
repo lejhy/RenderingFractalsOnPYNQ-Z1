@@ -78,7 +78,9 @@ class Mandelbrot_CPP:
     def width_fraction(self, value):
         self._width_fraction = value
         if self._shell:
-            self._shell.send("mandelbrot.set_width_fraction(%.15f)\n" % self._width_fraction)
+            self._shell.send(
+                "mandelbrot.set_width_fraction(%.15f)\n" % self._width_fraction
+            )
 
     @property
     def height_fraction(self):
@@ -88,7 +90,9 @@ class Mandelbrot_CPP:
     def height_fraction(self, value):
         self._height_fraction = value
         if self._shell:
-            self._shell.send("mandelbrot.set_height_fraction(%.15f)\n" % self._height_fraction)
+            self._shell.send(
+                "mandelbrot.set_height_fraction(%.15f)\n" % self._height_fraction
+            )
 
     @property
     def plot_x_min(self):
@@ -98,7 +102,9 @@ class Mandelbrot_CPP:
     def plot_x_min(self, value):
         self._plot_x_min = value
         if self._shell:
-            self._shell.send("mandelbrot.set_plot_x_min(%.15f)\n" % self._plot_x_min)
+            self._shell.send(
+                "mandelbrot.set_plot_x_min(%.15f)\n" % self._plot_x_min
+            )
 
     @property
     def plot_y_max(self):
@@ -108,7 +114,9 @@ class Mandelbrot_CPP:
     def plot_y_max(self, value):
         self._plot_y_max = value
         if self._shell:
-            self._shell.send("mandelbrot.set_plot_y_max(%.15f)\n" % self._plot_y_max)
+            self._shell.send(
+                "mandelbrot.set_plot_y_max(%.15f)\n" % self._plot_y_max
+            )
 
     @property
     def max_iteration(self):
@@ -118,7 +126,9 @@ class Mandelbrot_CPP:
     def max_iteration(self, value):
         self._max_iteration = value
         if self._shell:
-            self._shell.send("mandelbrot.set_max_iteration(%i)\n" % self._max_iteration)
+            self._shell.send(
+                "mandelbrot.set_max_iteration(%i)\n" % self._max_iteration
+            )
 
     @property
     def colour_offset(self):
@@ -128,7 +138,9 @@ class Mandelbrot_CPP:
     def colour_offset(self, value):
         self._colour_offset = value
         if self._shell:
-            self._shell.send("mandelbrot.set_colour_offset(%i)\n" % self._colour_offset)
+            self._shell.send(
+                "mandelbrot.set_colour_offset(%i)\n" % self._colour_offset
+            )
 
     @property
     def colour_span(self):
@@ -138,7 +150,9 @@ class Mandelbrot_CPP:
     def colour_span(self, value):
         self._colour_span = value
         if self._shell:
-            self._shell.send("mandelbrot.set_colour_span(%i)\n" % self._colour_span)
+            self._shell.send(
+                "mandelbrot.set_colour_span(%i)\n" % self._colour_span
+            )
 
     @property
     def colours(self):
@@ -150,7 +164,9 @@ class Mandelbrot_CPP:
     def set_colour(self, n, value):
         self._colours[n] = value
         if self._shell:
-            self._shell.send("mandelbrot.set_colour_%i(%i)\n" % (n, self._colours[n]))
+            self._shell.send(
+                "mandelbrot.set_colour_%i(%i)\n" % (n, self._colours[n])
+            )
 
     def calculate(self):
         if self.shell:

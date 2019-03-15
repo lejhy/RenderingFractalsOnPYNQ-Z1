@@ -25,13 +25,13 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	fixed_32_4_SAT y[PARALLEL_LOOPS][PARALLEL_SUB_LOOPS][SUB_LOOP_WIDTH];
 	#pragma HLS array_partition variable=y complete dim=2
 	#pragma HLS array_partition variable=y complete dim=1
-	int_16 iter[PARALLEL_LOOPS][PARALLEL_SUB_LOOPS][SUB_LOOP_WIDTH];
+	uint16_t iter[PARALLEL_LOOPS][PARALLEL_SUB_LOOPS][SUB_LOOP_WIDTH];
 	#pragma HLS array_partition variable=iter complete dim=2
 	#pragma HLS array_partition variable=iter complete dim=1
 
-	int_16 max_iter = config.max_iteration;
-	int_16 img_height = config.img_height;
-	int_16 img_width = config.img_width;
+	uint16_t max_iter = config.max_iteration;
+	uint16_t img_height = config.img_height;
+	uint16_t img_width = config.img_width;
 	fixed_32_4_SAT plot_height = config.plot_height;
 	fixed_32_4_SAT plot_width = config.plot_width;
 	fixed_32_4_SAT plot_x_min = config.plot_x_min;
@@ -39,14 +39,14 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	fixed_32_4_SAT width_fraction = (fixed_32_4_SAT)1 / img_width;
 	fixed_32_4_SAT height_fraction = (fixed_32_4_SAT)1 / img_height;
 
-	for(int_16 img_y = 0; img_y <= img_height; img_y = img_y + PARALLEL_LOOPS) {
+	for(uint16_t img_y = 0; img_y <= img_height; img_y = img_y + PARALLEL_LOOPS) {
 		// '<=' used since one extra loop is needed for img.write at the end
 
-		for(int_16 i = 0; i < PARALLEL_LOOPS; i++){// MAINTENANCE LOOP
-			int_16 img_x_offset = 0;
+		for(uint16_t i = 0; i < PARALLEL_LOOPS; i++){// MAINTENANCE LOOP
+			uint16_t img_x_offset = 0;
 
-			for(int_16 j = 0; j < PARALLEL_SUB_LOOPS; j++){
-				for(int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++){
+			for(uint16_t j = 0; j < PARALLEL_SUB_LOOPS; j++){
+				for(uint16_t sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++){
 					#pragma HLS LOOP_FLATTEN
 					#pragma HLS PIPELINE
 
@@ -58,16 +58,14 @@ void calculate(Config& config, RGB_IMAGE& img) {
 					if (img_y != img_height) {// INITIALISATION CODE
 						// nothing to initialise during the extra loop
 
-						int_16 img_x = img_x_offset + sub_x;
+						uint16_t img_x = img_x_offset + sub_x;
 						fixed_32_4_SAT x_0_t1 = img_x * width_fraction;
 						fixed_32_4_SAT x_0_t2 = plot_width * x_0_t1;
-
 						x_0[i][j][sub_x] = x_0_t2 + plot_x_min;
 
 						// use current img_y pixel row number (img_y+i)
 						fixed_32_4_SAT y_0_t1 = (img_y+i) * height_fraction;
 						fixed_32_4_SAT y_0_t2 = plot_height * y_0_t1;
-
 						y_0[i][j][sub_x] = plot_y_max - y_0_t2;
 
 						x[i][j][sub_x] = 0;
@@ -75,7 +73,6 @@ void calculate(Config& config, RGB_IMAGE& img) {
 						iter[i][j][sub_x] = 0;
 					}
 				}
-
 				img_x_offset += SUB_LOOP_WIDTH;
 			}
 		}
@@ -83,11 +80,18 @@ void calculate(Config& config, RGB_IMAGE& img) {
 		if (img_y != img_height) {
 			// nothing to process during the extra loop
 
-			for(int_16 i = 0; i < PARALLEL_LOOPS; i++) {// PROCESSING LOOP
+			for(uint16_t i = 0; i < PARALLEL_LOOPS; i++) {// PROCESSING LOOP
 				#pragma HLS UNROLL
-				for (int_16 j = 0; j < PARALLEL_SUB_LOOPS; j++) {
+				for (uint16_t j = 0; j < PARALLEL_SUB_LOOPS; j++) {
 					#pragma HLS UNROLL
-					subLineProcess(x_0[i][j], y_0[i][j], x[i][j], y[i][j], iter[i][j], max_iter);
+					subLineProcess(
+						x_0[i][j], 
+						y_0[i][j], 
+						x[i][j], 
+						y[i][j], 
+						iter[i][j], 
+						max_iter
+					);
 				}
 			}
 		}
@@ -95,9 +99,16 @@ void calculate(Config& config, RGB_IMAGE& img) {
 	}
 }
 
-void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x[], fixed_32_4_SAT y[], int_16 iter[], int_16 max_iter){
-	for (int j = 0; j < max_iter; j++) {
-		for (int_16 sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++) {
+void subLineProcess(
+	fixed_32_4_SAT x_0[],
+	fixed_32_4_SAT y_0[],
+	fixed_32_4_SAT x[],
+	fixed_32_4_SAT y[],
+	uint16_t iter[],
+	uint16_t max_iter
+){
+	for (uint16_t j = 0; j < max_iter; j++) {
+		for (uint16_t sub_x = 0; sub_x < SUB_LOOP_WIDTH; sub_x++) {
 			#pragma HLS PIPELINE
 			fixed_32_4_SAT x_sq = x[sub_x]*x[sub_x];
 			fixed_32_4_SAT y_sq = y[sub_x]*y[sub_x];
@@ -114,11 +125,11 @@ void subLineProcess(fixed_32_4_SAT x_0[], fixed_32_4_SAT y_0[], fixed_32_4_SAT x
 	}
 }
 
-RGB_PIXEL getPixel(int_16& iteration, int_16& max_iteration) {
+RGB_PIXEL getPixel(uint16_t& iteration, uint16_t& max_iteration) {
 	#pragma HLS INLINE
 	RGB_PIXEL result;
 	if (iteration < max_iteration) {
-		int colour = iteration % 512;
+		uint16_t colour = iteration % 512;
 		if (colour > 255) {
 			colour = colour - 256;
 			result = RGB_PIXEL(colour, 255, colour);

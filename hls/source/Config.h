@@ -4,8 +4,8 @@
 struct Config {
     unsigned int img_width;
     unsigned int img_height;
-    double width_fraction;
-    double height_fraction;
+    double plot_width;
+	double plot_height;
     double plot_x_min;
     double plot_y_max;
     unsigned int max_iteration;
