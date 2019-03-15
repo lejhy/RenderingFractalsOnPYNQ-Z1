@@ -13,8 +13,8 @@ class Mandelbrot(DefaultIP):
         self.write(0x04,1)
         self.write(0x08,1)
         # Setup default config
-        self.set_width_fraction(3.5/1920)
-        self.set_height_fraction(2.0/1080)
+        self.set_plot_width(3.5)
+        self.set_plot_height(2.0)
         self.set_plot_x_min(-2.5)
         self.set_plot_y_max(1.0)
         self.set_max_iteration(1000)
@@ -28,11 +28,11 @@ class Mandelbrot(DefaultIP):
 
     bindto = ['xilinx.com:hls:mandelbrot:1.0']
 
-    def set_width_fraction(self, width_fraction):
-        self.write(0x20,struct.pack('d', width_fraction))
+    def set_plot_width(self, plot_width):
+        self.write(0x20,struct.pack('d', plot_width))
 
-    def set_height_fraction(self, height_fraction):
-        self.write(0x2c,struct.pack('d', height_fraction))
+    def set_plot_height(self, plot_height):
+        self.write(0x2c,struct.pack('d', plot_height))
 
     def set_plot_x_min(self, plot_x_min):
         self.write(0x38,struct.pack('d', plot_x_min))

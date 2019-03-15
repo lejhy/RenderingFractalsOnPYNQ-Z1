@@ -19,8 +19,8 @@ const char source[] = BOOST_COMPUTE_STRINGIZE_SOURCE(
         __global uchar *data,
         const int img_width,
         const int img_height,
-        const double width_fraction,
-        const double height_fraction,
+        const double plot_width,
+        const double plot_height,
         const double plot_x_min,
         const double plot_y_max,
         const int max_iteration,
@@ -47,8 +47,8 @@ const char source[] = BOOST_COMPUTE_STRINGIZE_SOURCE(
         uint img_y = id / img_width;
         uint img_x = id % img_width;
 
-        double plot_x = img_x * width_fraction + plot_x_min;
-        double plot_y = plot_y_max - img_y * height_fraction;
+        double plot_x = plot_x_min + plot_width * (img_x / img_width);
+        double plot_y = plot_y_max - plot_height * (img_y / img_height);
 
         double x = 0.0;
         double y = 0.0;
@@ -133,8 +133,8 @@ const char source[] = BOOST_COMPUTE_STRINGIZE_SOURCE(
 np::ndarray calculate(
     int img_width, 
     int img_height, 
-    double width_fraction,
-    double height_fraction,
+    double plot_width,
+    double plot_height,
     double plot_x_min, 
     double plot_y_max, 
     uint max_iteration,
@@ -183,8 +183,8 @@ np::ndarray calculate(
         device_vector, 
         img_width, 
         img_height, 
-        width_fraction, 
-        height_fraction, 
+		plot_width,
+		plot_height,
         plot_x_min, 
         plot_y_max, 
         max_iteration,

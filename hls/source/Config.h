@@ -5,7 +5,7 @@ struct Config {
     unsigned int img_width;
     unsigned int img_height;
     double plot_width;
-	double plot_height;
+    double plot_height;
     double plot_x_min;
     double plot_y_max;
     unsigned int max_iteration;

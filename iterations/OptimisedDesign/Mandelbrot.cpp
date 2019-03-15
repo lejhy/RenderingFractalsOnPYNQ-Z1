@@ -61,7 +61,7 @@ void calculate(Config& config, RGB_IMAGE& img) {
 						uint16_t img_x = img_x_offset + sub_x;
 						fixed_32_4_SAT x_0_t1 = img_x * width_fraction;
 						fixed_32_4_SAT x_0_t2 = plot_width * x_0_t1;
-						x_0[i][j][sub_x] = x_0_t2 + plot_x_min;
+						x_0[i][j][sub_x] = plot_x_min + x_0_t2;
 
 						// use current img_y pixel row number (img_y+i)
 						fixed_32_4_SAT y_0_t1 = (img_y+i) * height_fraction;
