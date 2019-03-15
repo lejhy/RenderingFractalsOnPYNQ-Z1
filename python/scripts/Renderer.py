@@ -19,7 +19,7 @@ class Renderer:
 
     def timed_render_to_image(self):
         start = time.time()
-        image = self.render_to_notebook()
+        image = self.render_to_image()
         end = time.time()
         print("Render took:", end - start, "s")
         return image
