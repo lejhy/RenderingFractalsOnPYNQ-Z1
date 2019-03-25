@@ -12,4 +12,4 @@ Links
 * [HLS Pragmas](https://japan.xilinx.com/html_docs/xilinx2017_4/sdaccel_doc/okr1504034364623.html)
 * [HLS Mandelbrot example](https://github.com/delhatch/Mandel_HLS)
 * [HLS Mandelbrot Optimisation](http://legup.eecg.utoronto.ca/tutorials4.0/mandelbrot.pdf)
-* [HLS in Vivado Guide] (http://home.mit.bme.hu/~szanto/education/vimima15/heterogen_xilinx_hls.pdf)
+* [HLS in Vivado Guide](http://home.mit.bme.hu/~szanto/education/vimima15/heterogen_xilinx_hls.pdf)
