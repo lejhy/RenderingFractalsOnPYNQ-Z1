@@ -37,17 +37,22 @@ class PyQtView:
         self.colour_span.setMinimumWidth(50)
         self.colours = []
         self.save = QPushButton("save", self.label)
+        self.demo = QPushButton("demo", self.label)
+        self.restart = QPushButton("restart", self.label)
         self.window.setCentralWidget(self.label)
         self.h_box.addWidget(self.iteration)
         self.h_box.addWidget(self.colour_offset)
         self.h_box.addWidget(self.colour_span)
         self.h_box.addWidget(self.save)
+        self.h_box.addWidget(self.demo)
+        self.h_box.addWidget(self.restart)
         self.window.resize(1920, 1080)
         self.window.show()
 
     def render(self, img):
         qImg = QImage(img, 1920, 1080, 3*1920, QImage.Format_RGB888)
         self.label.setPixmap(QPixmap(qImg))
+        self.app.processEvents()
 
     def start_selection(self, x, y):
         self.selection.setGeometry(x, y, 1, 1)
